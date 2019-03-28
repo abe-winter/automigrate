@@ -1,3 +1,4 @@
 /.direnv/
 *.pyc
 __pycache__
+*.swp
