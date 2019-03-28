@@ -16,7 +16,44 @@ Tool to diff SQL schemas in git and apply the migrations.
 * modifying column types doesn't work (even something inoccuous like a default)
 * You can skip a diff, skip errors for a diff, or override a diff by ...
 * be careful with using unescaped keywords as names (i.e. a table named table) -- you'll likely confuse the parser even if your sql engine allows it
+* migrations meta tables are created by first run and upated by migrations, but you need to manually query them to know the last-applied migration (todo: what's the query?)
+* this hasn't been tested on a wide range of syntax (i.e. arrays / json)
+
+## Manually overriding migrations
+
+In cases where the tool generates a migration you don't like, you can use a `.manual-automigrate.py` file in the working directory to override changes and suppress errors.
+
+The format of this file is ...
+
+The override key is `(sha, type, tablename, item_name)` and will be output with migration errors and in verbose mode.
+
+Manual changes are logged in the meta tables so you can inspect the history in a pinch.
 
 ## Beta software
 
 This tool's output should be checked by an expert before applying it to a database.
+
+## Vs other tools
+
+* alembic / other auto migration generators
+	- they're generally language-specific and ORM-specific, this isn't
+	- they're not git-aware so you need to manage migration files
+	- they can usually connect to your DB -- this is designed to be run directly as SQL
+* apex sql diff
+* sqlite sqldiff.exe
+	- seems like a really good tool if you're operating on `.sqlite` files
+* liquibase
+	- supports 4 formats for migration (xml, yml, json, sql) -- this supports 0 because it doesn't need them
+	- requires you to explictly define migrations (I think) -- this doesn't
+
+## Using with ORMs
+
+Your ORM has to be willing to import a schema from create table statements. (I don't know any ORM that does this out of the box, although some can reflect a live DB).
+
+This project (todo) comes with a harness that reads create table commands into a SQLAlchemy schema. Happy to accept PRs to do this with other languages / ORMs.
+
+## Git edge cases
+
+* Run with working directory (i.e. non-committed changes). (todo support this)
+* What happens when a create table statement moves between files? Should work out of the box.
+* What happens when a file is deleted? (todo support this)
