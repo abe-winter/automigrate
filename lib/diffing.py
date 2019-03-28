@@ -16,9 +16,23 @@ def group_by_table(stmts):
   return groups
 
 def diff_stmt(left, right):
-  "diff two WrappedStmt with same unique key"
+  "diff two WrappedStmt with same unique key. return list of statements to run."
   assert left.unique == right.unique
-  raise NotImplementedError
+  table = left.table
+  if isinstance(left, wrappers.CreateTable):
+    left_cols = {col.name: col for col in left.columns()}
+    right_cols = {col.name: col for col in right.columns()}
+    new_cols = [
+      f'alter table {table} add column {right_cols[k].render()};'
+      for k in right_cols if k not in left_cols
+    ]
+    if any(k in left_cols and left_cols[k] != right_cols[k] for k in right_cols):
+      raise NotImplementedError('changed columns')
+    if any(k not in right_cols for k in left_cols):
+      raise NotImplementedError('dropped cols')
+    return new_cols
+  else:
+    raise DiffError("unhandled type", type(left))
 
 def diff_stmts(left, right):
   "takes WrappedStmt lists, all for same table, and compares them"
@@ -31,7 +45,7 @@ def diff_stmts(left, right):
     elif key_l[k] == key_r[k]:
       pass # not relevant to diff
     else:
-      output.append(diff_stmt(key_l[k], key_r[k]))
+      output.extend(diff_stmt(key_l[k], key_r[k]))
   return output
 
 def diff(left, right):
