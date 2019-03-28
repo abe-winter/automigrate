@@ -10,6 +10,15 @@ class WrappedStatement:
     "yes this is the way adults compare parse trees"
     return str(self.stmt).strip() == str(other.stmt).strip()
 
+  def decl(self):
+    "helper to get the function element, i.e. the table declaration"
+    return next(expr for expr in self.stmt if isinstance(expr, sqlparse.sql.Function))
+
+  @property
+  def table(self):
+    "return table name string"
+    return self.decl().get_name()
+
 def split_pun(tokens):
   "helper -- takes a list of tokens and returns contiguous blocks of non-punctuation, i.e. list of lists. also strips whitespace tokens"
   groups = [[]]
@@ -46,10 +55,6 @@ class CreateTable(WrappedStatement):
     assert stmt.get_type() == 'CREATE'
     self.stmt = stmt
 
-  def decl(self):
-    "helper to get the function element, i.e. the table declaration"
-    return next(expr for expr in self.stmt if isinstance(expr, sqlparse.sql.Function))
-
   def columns(self):
     decl = self.decl()
     paren = next(
@@ -59,18 +64,36 @@ class CreateTable(WrappedStatement):
     return list(map(Column, split_pun(paren)))
 
   @property
-  def table(self):
-    "return table name string"
-    return self.decl().get_name()
-
-  @property
   def unique(self):
     "unique key -- in this case, ('create', name) because we only allow one create stmt per table"
     return ('create', self.table)
 
+class CreateIndex(WrappedStatement):
+  def __init__(self, stmt):
+    assert isinstance(stmt, sqlparse.sql.Statement)
+    assert stmt.get_type() == 'CREATE'
+    self.stmt = stmt
+
+  @property
+  def index_name(self):
+    index_index = next(i for i, tok in enumerate(self.stmt) if tok.ttype and tok.ttype[-1] == 'Keyword' and tok.value == 'index')
+    on_index = next(i for i, tok in enumerate(self.stmt) if tok.ttype and tok.ttype[-1] == 'Keyword' and tok.value == 'on')
+    block = self.stmt[index_index:on_index]
+    ident, = next(tok for tok in block if isinstance(tok, sqlparse.sql.Identifier))
+    return ident.value
+
+  @property
+  def unique(self):
+    "unique key -- in this case, ('create', name) because we only allow one create stmt per table"
+    return ('index', self.index_name)
+
 def wrap(stmt):
   assert isinstance(stmt, sqlparse.sql.Statement)
   if stmt.get_type() == 'CREATE':
-    return CreateTable(stmt)
+    keywords = [tok.value for tok in stmt if tok.ttype and tok.ttype[-1] == 'Keyword']
+    if 'table' in keywords:
+      return CreateTable(stmt)
+    elif 'index' in keywords:
+      return CreateIndex(stmt)
   else:
     raise NotImplementedError(stmt.get_type())

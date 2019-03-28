@@ -9,7 +9,7 @@ def group_by_table(stmts):
   "take list of WrappedStatement"
   groups = collections.defaultdict(list)
   for stmt in stmts:
-    if isinstance(stmt, wrappers.CreateTable):
+    if isinstance(stmt, (wrappers.CreateTable, wrappers.CreateIndex)):
       groups[stmt.table].append(stmt)
     else:
       raise DiffError("unhandled type", type(stmt))

@@ -1,4 +1,5 @@
 import pytest, sqlparse
+# todo: make sure all-caps sql works too
 
 from ..lib import diffing
 
@@ -34,9 +35,11 @@ def test_modify_key():
   raise NotImplementedError
 
 CREATE_INDEX = [
-  '',
-  'create unique index idx_name on table (col);',
+  'create unique index idx_col1 on t1 (col1);',
+  'create unique index idx_col1 on t1 (col1); create unique index idx_col2 on t1 (col2);',
 ]
 
 def test_add_index():
-  raise NotImplementedError
+  delta = diffing.diff(*map(sqlparse.parse, CREATE_INDEX))
+  print('delta', str(delta[0]))
+  assert list(map(str, delta)) == ['create unique index idx_col2 on t1 (col2);']
