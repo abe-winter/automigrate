@@ -1,6 +1,4 @@
 import pytest, sqlparse
-# todo: make sure all-caps sql works too
-
 from automigrate.lib import diffing
 
 CREATE_TABLE = [
@@ -43,3 +41,7 @@ def test_add_index():
   delta = diffing.diff(*map(sqlparse.parse, CREATE_INDEX))
   print('delta', str(delta[0]))
   assert list(map(str, delta)) == ['create unique index idx_col2 on t1 (col2);']
+
+@pytest.mark.skip
+def test_all_caps_keywords():
+  raise NotImplementedError
