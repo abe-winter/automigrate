@@ -11,6 +11,8 @@ def group_by_table(stmts):
   for stmt in stmts:
     if isinstance(stmt, (wrappers.CreateTable, wrappers.CreateIndex)):
       groups[stmt.table].append(stmt)
+    elif stmt is None:
+      pass # where are these coming from? it happens in the test suite even
     else:
       raise DiffError("unhandled type", type(stmt))
   return groups
@@ -26,7 +28,13 @@ def diff_stmt(left, right):
       f'alter table {table} add column {right_cols[k].render()};'
       for k in right_cols if k not in left_cols
     ]
-    if any(k in left_cols and left_cols[k] != right_cols[k] for k in right_cols):
+    changed = {
+      k: (left_cols[k], right_cols[k])
+      for k in right_cols
+      if k in left_cols and left_cols[k] != right_cols[k]
+    }
+    if changed:
+      print('changed', {k: (a.render(), b.render()) for k, (a, b) in changed.items()})
       raise NotImplementedError('changed columns')
     if any(k not in right_cols for k in left_cols):
       raise NotImplementedError('dropped cols')

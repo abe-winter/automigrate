@@ -40,6 +40,9 @@ psql -c "select * from migrations where "
 * migrations meta tables are created by first run and upated by migrations, but you need to manually query them to know the last-applied migration (todo: what's the query?)
 * this hasn't been tested on a wide range of syntax (i.e. arrays / json)
 * What happens when metadata schema changes?
+* Not sure if capitalized SQL keywords are supported (todo add tests)
+* Arbitrary whitespace changes -- probably not (todo add tests)
+* Huge schema files larger than memory, i.e. likely containing big inserts -- not supported yet
 
 ## Manually overriding migrations
 

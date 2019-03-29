@@ -95,5 +95,7 @@ def wrap(stmt):
       return CreateTable(stmt)
     elif 'index' in keywords:
       return CreateIndex(stmt)
+  elif stmt.get_type() == 'UNKNOWN':
+    pass # cross fingers this means whitespace
   else:
-    raise NotImplementedError(stmt.get_type())
+    raise NotImplementedError(stmt.get_type(), stmt)

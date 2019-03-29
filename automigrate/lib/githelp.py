@@ -1,0 +1,36 @@
+"githelp.py -- helpers for doing things on git"
+
+import git, fnmatch, os
+
+def parse_range(string):
+  "parse git-style sha-ranges"
+  if '...' in string:
+    raise NotImplementedError("don't know how to handle 3-dot range")
+  elif '..' in string:
+    left, _, right = string.partition('..')
+    return left, right
+  else:
+    return string,
+
+def get_paths(tree, pattern, root=()):
+  """given tree (a git tree at a desired ref) return list of paths matching pattern
+  note: this matches paths that existed at the time of ref, including files that don't exist now and excluding ones that exist on disk but were missing at ref
+  """
+  found = []
+  for item in tree:
+    if isinstance(item, git.Blob):
+      path = os.path.join(*root, item.name)
+      if fnmatch.fnmatch(path, pattern):
+        found.append(path)
+    elif isinstance(item, git.Tree):
+      found.extend(get_paths(item, pattern, root + (item.name,)))
+    else:
+      raise NotImplementedError("unexpected type in tree", item)
+  return found
+
+def get_streams(tree, pattern):
+  """given ref (git sha or reference as string) and glob (glob pattern as string)
+  return list of read()-ables for file contents
+  todo: support repos you're not inside of
+  """
+  return [tree[path].data_stream for path in get_paths(tree, pattern)]
