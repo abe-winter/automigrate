@@ -9,12 +9,6 @@ SHAS = {
 }
 GLOB ='test/schema/*.sql'
 
-def test_parse_range():
-  with pytest.raises(NotImplementedError):
-    githelp.parse_range('a...b')
-  assert githelp.parse_range('a..b') == ('a', 'b')
-  assert githelp.parse_range('a') == ('a',)
-
 def test_get_paths():
   tree = git.Repo().commit(SHAS['create-t1']).tree
   assert githelp.get_paths(tree, GLOB) == ['test/schema/sql.sql']
@@ -30,8 +24,12 @@ def test_create():
 
 def test_addcol():
   repo = git.Repo()
-  diff = ref_diff.ref_diff(git.Repo(), SHAS['create-t1'], SHAS['add-t1-col'], GLOB)
+  diff = ref_diff.ref_range_diff(git.Repo(), SHAS['create-t1'], SHAS['add-t1-col'], GLOB)
   print('diff', diff)
+  raise NotImplementedError
+
+@pytest.mark.skip
+def test_add_multi_commit():
   raise NotImplementedError
 
 @pytest.mark.skip

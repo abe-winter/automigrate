@@ -1,16 +1,6 @@
 "githelp.py -- helpers for doing things on git"
 
-import git, fnmatch, os
-
-def parse_range(string):
-  "parse git-style sha-ranges"
-  if '...' in string:
-    raise NotImplementedError("don't know how to handle 3-dot range")
-  elif '..' in string:
-    left, _, right = string.partition('..')
-    return left, right
-  else:
-    return string,
+import git, fnmatch, os, collections
 
 def get_paths(tree, pattern, root=()):
   """given tree (a git tree at a desired ref) return list of paths matching pattern
