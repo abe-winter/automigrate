@@ -2,6 +2,27 @@
 
 Tool to diff SQL schemas in git and apply the migrations.
 
+## Beta software
+
+This tool's output should be checked by an expert before applying it to a database.
+
+## Installation & basic use
+
+To install, `pip install git+https://github.com/abe-winter/automigrate`. This should install dependencies and register the automig command in your virtualenv.
+
+Typical invocations:
+
+```
+# create an initial migration (also create meta tables)
+automig HEAD 'schema/*.sql' --initial > migration.sql
+
+# run directly with psql
+automig HEAD 'schema/*.sql' | psql
+
+# migrate a database
+psql -c "select * from migrations where "
+```
+
 ## Features
 
 * operate on `*.sql` files (i.e. files with `create table`, `create index`, and possibly `insert` stmts) 
@@ -18,6 +39,7 @@ Tool to diff SQL schemas in git and apply the migrations.
 * be careful with using unescaped keywords as names (i.e. a table named table) -- you'll likely confuse the parser even if your sql engine allows it
 * migrations meta tables are created by first run and upated by migrations, but you need to manually query them to know the last-applied migration (todo: what's the query?)
 * this hasn't been tested on a wide range of syntax (i.e. arrays / json)
+* What happens when metadata schema changes?
 
 ## Manually overriding migrations
 
@@ -29,10 +51,6 @@ The override key is `(sha, type, tablename, item_name)` and will be output with 
 
 Manual changes are logged in the meta tables so you can inspect the history in a pinch.
 
-## Beta software
-
-This tool's output should be checked by an expert before applying it to a database.
-
 ## Vs other tools
 
 * alembic / other auto migration generators
@@ -40,6 +58,9 @@ This tool's output should be checked by an expert before applying it to a databa
 	- they're not git-aware so you need to manage migration files
 	- they can usually connect to your DB -- this is designed to be run directly as SQL
 * apex sql diff
+	- they can operate on 'script folders' and integrate with source control
+	- not sure what this means in practice
+	- I think this product is GUI-first and only runs on windows?
 * sqlite sqldiff.exe
 	- seems like a really good tool if you're operating on `.sqlite` files
 * liquibase
