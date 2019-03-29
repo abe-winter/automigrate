@@ -1,7 +1,7 @@
 import pytest, sqlparse
 # todo: make sure all-caps sql works too
 
-from ..lib import diffing
+from automigrate.lib import diffing
 
 CREATE_TABLE = [
   'create table t1 (a int);',
