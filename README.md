@@ -2,10 +2,27 @@
 
 Tool to diff SQL schemas in git and apply the migrations.
 
+Use this if you don't like to manage migrations separately from your declarative schema definitions.
+
+* [Warning this is beta software](#beta-software)
+* [Features](#features)
+* [Installation & basic use](#installation--basic-use)
+* [What does & doesn't work](#what-does--doesnt-work)
+* [Comparison with other tools](#vs-other-tools)
+* [Using with ORMs](#using-with-orms)
+
 ## Beta software
+
+This is beta software and you should be careful with its output.
 
 * Eyeball the migrations before applying them
 * Proactively raise github issues for things that seem broken
+
+## Features
+
+* Operates on `*.sql` files (i.e. files with `create table` and `create index` statements)
+* Operates on git -- meaning that it tracks the git version of applied migration and can create a SQL migration given two git refs
+* Stores the history of applied migrations in sql in `automigrate_meta` table
 
 ## Installation & basic use
 
@@ -26,13 +43,6 @@ automig $LAST_SHA...b5b40ce 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres
 automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --single-transaction
 ```
 
-## Features
-
-* operate on `*.sql` files (i.e. files with `create table` and `create index` statements)
-* operate on git -- meaning that it tracks the git version of applied migration and can create a SQL migration given two git refs
-* store history of applied migrations in sql in `automigrate_meta` table
-* **doesn't** inspect live SQL schemas (yet -- but we should at minimum do this to check that the target db is as expected)
-
 ## What does & doesn't work
 
 * Adding tables, indexes and columns should mostly work
@@ -42,14 +52,14 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 * Be careful with using unescaped keywords as names (i.e. a table named table) -- you'll likely confuse the parser even where your sql engine allows it
 * This hasn't been tested on a wide range of syntax (i.e. arrays / json)
 * Not sure if capitalized SQL keywords are supported (todo add tests)
-* Arbitrary whitespace changes -- probably not (todo add tests)
+* Arbitrary whitespace changes can probably confuse the parser (todo add tests)
 * Anything that messes with the git history (like a rebase) is deeply confusing to this tool and will result in bad migrations. Workaround:
     - figure out the new sha that corresponds to your last old sha -- most likely you can do a `git show $OLDSHA` and then look for that commit msg in `git log`
     - and insert that corresponding sha into the `automigrate_meta` table: `psql -h 172.17.0.2 -U postgres -c "insert into automigrate (sha) values ('$NEWSHA')"`
     - you should be good to go
     - todo: find a way to automatically detect & recover from rebases
 
-## Vs other tools
+## Comparison vs other tools
 
 * alembic / other auto migration generators
 	- they're generally language-specific and ORM-specific, this isn't
@@ -67,6 +77,6 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 
 ## Using with ORMs
 
-Your ORM has to be willing to import a schema from create table statements. (I don't know any ORM that does this out of the box, although some can reflect a live DB).
+Your ORM has to be willing to import a schema from create table statements. (I don't know any ORM that does this out of the box, although some can reflect a live DB, like [sqlalchemy's automap](https://docs.sqlalchemy.org/en/latest/orm/extensions/automap.html)).
 
 Happy to accept PRs to generate ORM defs from `create table` stmts (or vice versa).
