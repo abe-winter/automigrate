@@ -43,7 +43,11 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 * This hasn't been tested on a wide range of syntax (i.e. arrays / json)
 * Not sure if capitalized SQL keywords are supported (todo add tests)
 * Arbitrary whitespace changes -- probably not (todo add tests)
-* Anything that messes with the git history (like a rebase) is deeply confusing to this tool and will result in bad migrations. Workaround: figure out the new sha that corresponds to your last old sha and insert it into the `automigrate_meta` table.
+* Anything that messes with the git history (like a rebase) is deeply confusing to this tool and will result in bad migrations. Workaround:
+    - figure out the new sha that corresponds to your last old sha -- most likely you can do a `git show $OLDSHA` and then look for that commit msg in `git log`
+    - and insert that corresponding sha into the `automigrate_meta` table: `psql -h 172.17.0.2 -U postgres -c "insert into automigrate (sha) values ('$NEWSHA')"`
+    - you should be good to go
+    - todo: find a way to automatically detect & recover from rebases
 
 ## Vs other tools
 
