@@ -67,9 +67,9 @@ def diff(left, right):
   output = collections.OrderedDict()
   for key, stmts in groups_r.items():
     if key in groups_l:
-      changes = list(map(str, diff_stmts(groups_l[key], stmts)))
+      changes = [str(stmt).strip() for stmt in diff_stmts(groups_l[key], stmts)]
       if changes:
         output[key] = changes
     else:
-      output[key] = [str(wrapped.stmt) for wrapped in stmts]
+      output[key] = [str(wrapped.stmt).strip() for wrapped in stmts]
   return output

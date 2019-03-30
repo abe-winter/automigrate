@@ -24,10 +24,12 @@ def ref_diff(repo, ref1, ref2, pattern):
 
 def ref_range_diff(repo, ref1, ref2, pattern):
   "run ref_diff() once per intermediate commit for commits who change files matching pattern"
-  commits = [repo.commit(ref1)] + list(repo.iter_commits(
+  commits = list(repo.iter_commits(
     f'{ref1}...{ref2}',
     paths=pattern
   ))
+  commits.append(repo.commit(ref1))
+  commits = list(reversed(commits))
   return collections.OrderedDict([
     [right.hexsha, ref_diff(repo, left.hexsha, right.hexsha, pattern)]
     for left, right in zip(commits[:-1], commits[1:])
