@@ -1,6 +1,6 @@
 "ref_diff.py -- run sql diffs on git repos"
 
-import sqlparse
+import sqlparse, collections
 from . import githelp, diffing
 
 def files_to_smts(readables):
@@ -28,7 +28,7 @@ def ref_range_diff(repo, ref1, ref2, pattern):
     f'{ref1}...{ref2}',
     paths=pattern
   ))
-  return {
-    right.hexsha: ref_diff(repo, left.hexsha, right.hexsha, pattern)
+  return collections.OrderedDict([
+    [right.hexsha, ref_diff(repo, left.hexsha, right.hexsha, pattern)]
     for left, right in zip(commits[:-1], commits[1:])
-  }
+  ])

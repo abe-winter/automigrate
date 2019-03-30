@@ -3,7 +3,7 @@ from automigrate.lib import githelp, ref_diff
 
 SHAS = {
   'create-t1': '218dd2c',
-  'add-t1-col': '9dcbd4e',
+  'add-t1-col': '9dcbd4e81e9a0dd7629ed7ae82a86891a88f76f3',
   'add-t2-t1a': 'b5b40ce',
   'unsup-alter-col': '0756d87',
 }

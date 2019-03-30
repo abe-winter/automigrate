@@ -64,10 +64,12 @@ def diff(left, right):
   # todo: figure out some way to store stmt order
   groups_l = group_by_table(map(wrappers.wrap, left))
   groups_r = group_by_table(map(wrappers.wrap, right))
-  output = []
-  for key in groups_r:
+  output = collections.OrderedDict()
+  for key, stmts in groups_r.items():
     if key in groups_l:
-      output.extend(diff_stmts(groups_l[key], groups_r[key]))
+      changes = list(map(str, diff_stmts(groups_l[key], stmts)))
+      if changes:
+        output[key] = changes
     else:
-      output.extend(wrapped.stmt for wrapped in groups_r[key])
+      output[key] = [str(wrapped.stmt) for wrapped in stmts]
   return output

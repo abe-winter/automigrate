@@ -8,7 +8,7 @@ CREATE_TABLE = [
 
 def test_create_table():
   delta = diffing.diff(*map(sqlparse.parse, CREATE_TABLE))
-  assert list(map(str, delta)) == ['create table t2 (a int);']
+  assert delta == {'t2': ['create table t2 (a int);']}
 
 @pytest.mark.skip
 def test_drop_table():
@@ -22,7 +22,7 @@ ADD_COLUMN = [
 
 def test_add_column():
   delta = diffing.diff(*map(sqlparse.parse, ADD_COLUMN))
-  assert delta == ['alter table t1 add column b int;']
+  assert delta == {'t1': ['alter table t1 add column b int;']}
 
 @pytest.mark.skip
 def test_modify_column():
@@ -39,8 +39,7 @@ CREATE_INDEX = [
 
 def test_add_index():
   delta = diffing.diff(*map(sqlparse.parse, CREATE_INDEX))
-  print('delta', str(delta[0]))
-  assert list(map(str, delta)) == ['create unique index idx_col2 on t1 (col2);']
+  assert delta == {'t1': ['create unique index idx_col2 on t1 (col2);']}
 
 @pytest.mark.skip
 def test_all_caps_keywords():
