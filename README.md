@@ -4,7 +4,8 @@ Tool to diff SQL schemas in git and apply the migrations.
 
 ## Beta software
 
-This tool's output should be checked by an expert before applying it to a database.
+* Eyeball the migrations before applying them
+* Proactively raise github issues for things that seem broken
 
 ## Installation & basic use
 
@@ -12,7 +13,7 @@ To install, `pip install git+https://github.com/abe-winter/automigrate`. This sh
 
 Typical invocations:
 
-```
+```bash
 # create an initial migration (also create meta tables)
 automig 218dd2c 'test/schema/*.sql' --initial | psql -h 172.17.0.2 -U postgres --single-transaction
 
@@ -42,6 +43,7 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 * This hasn't been tested on a wide range of syntax (i.e. arrays / json)
 * Not sure if capitalized SQL keywords are supported (todo add tests)
 * Arbitrary whitespace changes -- probably not (todo add tests)
+* Anything that messes with the git history (like a rebase) is deeply confusing to this tool and will result in bad migrations. Workaround: figure out the new sha that corresponds to your last old sha and insert it into the `automigrate_meta` table.
 
 ## Vs other tools
 
@@ -54,7 +56,7 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 	- not sure what this means in practice
 	- I think this product is GUI-first and only runs on windows?
 * sqlite sqldiff.exe
-	- seems like a really good tool if you're operating on `.sqlite` files
+	- seems like a really good tool if you're operating on sqlite databases
 * liquibase
 	- supports 4 formats for migration (xml, yml, json, sql) -- this supports 0 because it doesn't need them
 	- requires you to explictly define migrations (I think) -- this doesn't
@@ -63,4 +65,4 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 
 Your ORM has to be willing to import a schema from create table statements. (I don't know any ORM that does this out of the box, although some can reflect a live DB).
 
-This project (todo) comes with a harness that reads create table commands into a SQLAlchemy schema. Happy to accept PRs to do this with other languages / ORMs.
+Happy to accept PRs to generate ORM defs from `create table` stmts (or vice versa).
