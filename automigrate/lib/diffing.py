@@ -1,6 +1,6 @@
 "diffing.py -- sql-diffing"
 
-import collections, sqlparse
+import collections, sqlparse, yaml
 from . import wrappers
 
 class DiffError(Exception): pass
@@ -16,6 +16,9 @@ def group_by_table(stmts):
     else:
       raise DiffError("unhandled type", type(stmt))
   return groups
+
+class UnsupportedChange(Exception):
+  "returned in place of a migration string when there's an error"
 
 def diff_stmt(left, right):
   "diff two WrappedStmt with same unique key. return list of statements to run."
@@ -34,10 +37,10 @@ def diff_stmt(left, right):
       if k in left_cols and left_cols[k] != right_cols[k]
     }
     if changed:
-      print('changed', {k: (a.render(), b.render()) for k, (a, b) in changed.items()})
-      raise NotImplementedError('changed columns')
+      detail = {k: (a.render(), b.render()) for k, (a, b) in changed.items()}
+      return [UnsupportedChange("we don't know how to change columns", detail)]
     if any(k not in right_cols for k in left_cols):
-      raise NotImplementedError('dropped cols')
+      return [UnsupportedChange("we don't know how to drop columns")]
     return new_cols
   else:
     raise DiffError("unhandled type", type(left))
@@ -49,7 +52,7 @@ def diff_stmts(left, right):
   output = []
   for k in key_r:
     if k not in key_l:
-      output.append(key_r[k].stmt)
+      output.append(str(key_r[k].stmt).strip())
     elif key_l[k] == key_r[k]:
       pass # not relevant to diff
     else:
@@ -58,18 +61,25 @@ def diff_stmts(left, right):
 
 def diff(left, right):
   """take two lists of statements.
-  return a list of statements to migrate from left to right.
-  throw an error? (or list of explanatory errors) if we can't gen a migration.
+  return dict of {tablename: list of migration statements or errors}
   """
-  # todo: figure out some way to store stmt order
+  # todo: figure out some way to apply statements in order even across tables
+  # realistically this needs to be a database, not a nested dict -- it gets queried in a lot of ways
   groups_l = group_by_table(map(wrappers.wrap, left))
   groups_r = group_by_table(map(wrappers.wrap, right))
   output = collections.OrderedDict()
   for key, stmts in groups_r.items():
     if key in groups_l:
-      changes = [str(stmt).strip() for stmt in diff_stmts(groups_l[key], stmts)]
+      changes = [stmt for stmt in diff_stmts(groups_l[key], stmts)]
       if changes:
         output[key] = changes
     else:
       output[key] = [str(wrapped.stmt).strip() for wrapped in stmts]
   return output
+
+def get_errors(table_stmt_dict):
+  return {
+    table: [stmt for stmt in stmts if isinstance(stmt, Exception)]
+    for table, stmts in table_stmt_dict.items()
+    if any(isinstance(stmt, Exception) for stmt in stmts)
+  }

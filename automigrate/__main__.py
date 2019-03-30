@@ -5,7 +5,7 @@
 # automig 218dd2c...b5b40ce 'test/schema/*.sql'
 # automig 218dd2c...HEAD 'test/schema/*.sql'
 
-import argparse, git
+import argparse, git, os, yaml
 from datetime import datetime
 from .lib import ref_diff, githelp
 
@@ -29,6 +29,9 @@ def main():
   rev_tuple = githelp.parse_rev_to_tuple(args.ref)
   print(f'-- changeset created from {args} at {datetime.now()}')
   shas = []
+  manual_mig = {}
+  if os.path.exists('.manualmig.yml'):
+    manual_mig = yaml.safe_load(open('.manualmig.yml'))['overrides']
   if args.initial:
     print(PREAMBLE)
     commit = git.Repo().commit(rev_tuple[0])
@@ -40,6 +43,11 @@ def main():
   else:
     assert len(rev_tuple) == 2, "must pass a sha range or set --initial"
     changes = ref_diff.ref_range_diff(git.Repo(), *rev_tuple, args.glob)
+    errors = ref_diff.extract_errors(changes)
+    if errors:
+      remaining = ref_diff.try_repair_errors(errors, manual_mig, changes)
+      if remaining:
+        raise ValueError('errors not overridden in .manualmig.yml', remaining)
     for sha, tables in changes.items():
       shas.append(sha)
       for table, stmts in tables.items():

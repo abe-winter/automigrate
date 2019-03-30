@@ -34,3 +34,26 @@ def ref_range_diff(repo, ref1, ref2, pattern):
     [right.hexsha, ref_diff(repo, left.hexsha, right.hexsha, pattern)]
     for left, right in zip(commits[:-1], commits[1:])
   ])
+
+def extract_errors(sha_table_stmts):
+  ret = {
+    sha: diffing.get_errors(table_stmts)
+    for sha, table_stmts in sha_table_stmts.items()
+  }
+  for k, v in list(ret.items()):
+    if not v:
+      del ret[k]
+  return ret
+
+def try_repair_errors(errors, manual_overrides, sha_table_stmts):
+  """Try to repair this.
+  errors is {sha: {table: error_list}}
+  manual_overrides is {sha: {table: stmts}}
+  sha_table_stmts is {sha: {table: stmts}}
+  returns remaining_errors, mutates sha_table_stmts.
+  """
+  for sha, table_errors in errors.items():
+    for table in table_errors:
+      if sha in manual_overrides and table in manual_overrides[sha]:
+        sha_table_stmts[sha][table] = manual_overrides[sha][table]
+  return extract_errors(sha_table_stmts)

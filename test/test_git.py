@@ -1,5 +1,5 @@
-import git, glob, pytest
-from automigrate.lib import githelp, ref_diff
+import git, glob, pytest, sqlparse
+from automigrate.lib import githelp, ref_diff, diffing
 
 SHAS = {
   'create-t1': '218dd2c',
@@ -37,6 +37,15 @@ def test_add_multi_commit():
     },
   }
 
-@pytest.mark.skip
-def test_unsup():
-  raise NotImplementedError
+MOD_COLUMN = [
+  'create table t1 (a int primary key, b int);',
+  'create table t1 (a int primary key, b int default 10);',
+]
+
+def test_error_bubbling():
+  sha_table_stmts = {'sha': diffing.diff(*map(sqlparse.parse, MOD_COLUMN))}
+  errors = ref_diff.extract_errors(sha_table_stmts)
+  manual = {'sha': {'t1': ['hello']}}
+  remaining = ref_diff.try_repair_errors(errors, manual, sha_table_stmts)
+  assert not remaining
+  assert sha_table_stmts['sha']['t1'] == ['hello']
