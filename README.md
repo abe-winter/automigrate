@@ -14,13 +14,15 @@ Typical invocations:
 
 ```
 # create an initial migration (also create meta tables)
-automig HEAD 'schema/*.sql' --initial > migration.sql
-
-# run directly with psql
-automig HEAD 'schema/*.sql' | psql
+automig 218dd2c 'test/schema/*.sql' --initial | psql -h 172.17.0.2 -U postgres --single-transaction
 
 # migrate a database
-psql -c "select * from migrations where "
+LAST_SHA=$(psql -h 172.17.0.2 -U postgres -t -c "select sha from automigrate_meta order by id desc limit 1")
+echo migrating from $LAST_SHA
+automig $LAST_SHA...b5b40ce 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --single-transaction
+
+# I guess you can just migrate to HEAD if you're feeling lucky
+automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --single-transaction
 ```
 
 ## Features

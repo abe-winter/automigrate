@@ -13,7 +13,6 @@ PARSER = argparse.ArgumentParser(__doc__)
 PARSER.add_argument('ref', help="single git ref (i.e. sha) or sha1...sha2")
 PARSER.add_argument('glob', help="glob to grab paths, typicaly 'schema/*.sql' or something. use quotes so bash doesn't complete it")
 PARSER.add_argument('--initial', action='store_true', help="is this an initial commit (i.e. create metadata)")
-PARSER.add_argument('--transactional', action='store_true', help="definitely enable this on DBs that support transactional DDL")
 
 # this creates the meta tables
 PREAMBLE = """
@@ -22,13 +21,11 @@ create table automigrate_meta_meta (id serial primary key, meta_version int);
 insert into automigrate_meta_meta (meta_version) values (1);
 
 -- meta stores the schema version
-create table automigrate_meta (id serial primary key, sha text, applied datetime default now());
+create table automigrate_meta (id serial primary key, sha text, applied timestamp default now());
 """
 
 def main():
   args = PARSER.parse_args()
-  if args.transactional:
-    raise NotImplementedError('transactional DDL not supported yet')
   rev_tuple = githelp.parse_rev_to_tuple(args.ref)
   print(f'-- changeset created from {args} at {datetime.now()}')
   shas = []
