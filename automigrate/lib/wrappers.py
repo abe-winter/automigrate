@@ -20,7 +20,11 @@ class WrappedStatement:
     return self.decl().get_name()
 
 def split_pun(tokens):
-  "helper -- takes a list of tokens and returns contiguous blocks of non-punctuation, i.e. list of lists. also strips whitespace tokens"
+  """Takes a list of tokens and other stuff.
+  Returns contiguous blocks of non-punctuation, i.e. list of lists.
+  Recurses into IdentifierList which are inserted in insane places.
+  Also strips whitespace tokens.
+  """
   groups = [[]]
   for tok in tokens:
     if isinstance(tok, sqlparse.sql.Token) and tok.ttype and tok.ttype[0] == 'Punctuation':
@@ -28,6 +32,12 @@ def split_pun(tokens):
         groups.append([])
     elif isinstance(tok, sqlparse.sql.Token) and tok.ttype and tok.ttype[-1] == 'Whitespace':
       pass
+    elif isinstance(tok, sqlparse.sql.IdentifierList):
+      # this is insane
+      inner = split_pun(tok)
+      groups[-1].extend(inner[0])
+      groups.extend(inner[1:])
+      # note: intentionally not putting an empty list on the end. This is covered in test_diffing.py
     else:
       groups[-1].append(tok)
   if not groups[-1]:

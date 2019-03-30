@@ -16,8 +16,8 @@ def test_drop_table():
   raise NotImplementedError
 
 ADD_COLUMN = [
-  'create table t1 (a int);',
-  'create table t1 (a int, b int);',
+  'create table t1 (a int primary key);',
+  'create table t1 (a int primary key, b int);',
 ]
 
 def test_add_column():
