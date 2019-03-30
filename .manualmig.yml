@@ -1,5 +1,5 @@
 # .manualmig
 # this overrides migration errors
 overrides:
-  0756d875f22621d496dd01c2f4dd36c01b7faf19:
-    t1: ['alter table t1 alter column b type text']
+  c479bb060c2c162c496578f86c7f4addf45ff560:
+    t1: ['alter table t1 alter column b type text;']
