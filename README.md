@@ -27,34 +27,21 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 
 ## Features
 
-* operate on `*.sql` files (i.e. files with `create table`, `create index`, and possibly `insert` stmts) 
-* operate on git -- meaning that it knows the git version of the last applied migration and can diff vs 
+* operate on `*.sql` files (i.e. files with `create table` and `create index` statements)
+* operate on git -- meaning that it tracks the git version of applied migration and can create a SQL migration given two git refs
+* store history of applied migrations in sql in `automigrate_meta` table
 * **doesn't** inspect live SQL schemas (yet -- but we should at minimum do this to check that the target db is as expected)
-* store history of applied migrations in sql in some kind of meta table
 
 ## What does & doesn't work
 
 * Adding tables, indexes and columns should mostly work
 * modifying primary keys doesn't work
 * modifying column types doesn't work (even something inoccuous like a default)
-* You can skip a diff, skip errors for a diff, or override a diff by ...
-* be careful with using unescaped keywords as names (i.e. a table named table) -- you'll likely confuse the parser even if your sql engine allows it
-* migrations meta tables are created by first run and upated by migrations, but you need to manually query them to know the last-applied migration (todo: what's the query?)
-* this hasn't been tested on a wide range of syntax (i.e. arrays / json)
-* What happens when metadata schema changes?
+* For diffs that are erroring, you can override with a [.manualmig.yml file](./.manualmig.yml)
+* Be careful with using unescaped keywords as names (i.e. a table named table) -- you'll likely confuse the parser even where your sql engine allows it
+* This hasn't been tested on a wide range of syntax (i.e. arrays / json)
 * Not sure if capitalized SQL keywords are supported (todo add tests)
 * Arbitrary whitespace changes -- probably not (todo add tests)
-* Huge schema files larger than memory, i.e. likely containing big inserts -- not supported yet
-
-## Manually overriding migrations
-
-In cases where the tool generates a migration you don't like, you can use a `.manual-automigrate.py` file in the working directory to override changes and suppress errors.
-
-The format of this file is ...
-
-The override key is `(sha, type, tablename, item_name)` and will be output with migration errors and in verbose mode.
-
-Manual changes are logged in the meta tables so you can inspect the history in a pinch.
 
 ## Vs other tools
 
@@ -77,9 +64,3 @@ Manual changes are logged in the meta tables so you can inspect the history in a
 Your ORM has to be willing to import a schema from create table statements. (I don't know any ORM that does this out of the box, although some can reflect a live DB).
 
 This project (todo) comes with a harness that reads create table commands into a SQLAlchemy schema. Happy to accept PRs to do this with other languages / ORMs.
-
-## Git edge cases
-
-* Run with working directory (i.e. non-committed changes). (todo support this)
-* What happens when a create table statement moves between files? Should work out of the box.
-* What happens when a file is deleted? (todo support this)
