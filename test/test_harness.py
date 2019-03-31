@@ -23,6 +23,7 @@ def test_transform_simple():
 def test_transform_index():
   raise NotImplementedError
 
-@pytest.mark.skip
 def test_transform_composite_key():
-  raise NotImplementedError
+  # note: I think that still doesn't support this
+  sa_tables = transform_string('create table t1 (a int, b int, primary key (a, b));')
+  assert sa_tables == ["sa.Table('t1', META, sa.Column('a', sa.Integer, primary_key=True), sa.Column('b', sa.Integer, primary_key=True))"]
