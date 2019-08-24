@@ -30,6 +30,7 @@ This is beta software and you should be careful with its output.
 * Existing migration tools don't pull their weight
 * SQL is a more general skill than ORMs and other tools should therefore mirror SQL
 * Mirroring live databases to get a schema is insane because are you tunneling to prod to run your linter? Live DB shouldn't be available to developers. Source of truth should be git.
+* Schema should be versioned using the same git shas as code so the logic is easy to detect if a deploy requires a migration
 
 ## Installation & basic use
 
@@ -60,6 +61,7 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 * [ ] This hasn't been tested on a wide range of syntax (i.e. arrays / json)
 * [ ] Not sure if capitalized SQL keywords are supported (todo add tests)
 * [ ] Arbitrary whitespace changes can probably confuse the parser (todo add tests)
+* [ ] Need a way to test applied SQL against desired
 * [ ] Anything that messes with the git history (like a rebase) is deeply confusing to this tool and will result in bad migrations. Workaround:
     - **warning**: this method only works if the rebase doesn't change migrations
     - figure out the new sha that corresponds to your last old sha -- most likely you can do a `git show $OLDSHA` and then look for that commit msg in `git log`
