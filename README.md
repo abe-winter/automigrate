@@ -8,7 +8,7 @@ Use this if you don't like to manage migrations separately from your declarative
 * [Features](#features)
 * [Installation & basic use](#installation--basic-use)
 * [What does & doesn't work](#what-does--doesnt-work)
-* [Comparison with other tools](#vs-other-tools)
+* [Comparison vs other tools](#comparison-vs-other-tools)
 * [Using with ORMs](#using-with-orms)
 
 ## Beta software
@@ -23,6 +23,13 @@ This is beta software and you should be careful with its output.
 * Operates on `*.sql` files (i.e. files with `create table` and `create index` statements)
 * Operates on git -- meaning that it tracks the git version of applied migration and can create a SQL migration given two git refs
 * Stores the history of applied migrations in sql in `automigrate_meta` table
+
+## Philosophy
+
+* Defining your schema in your ORM is nuts because it ties you to one language, reduces clarity, and sometimes limits SQL features you can use
+* Existing migration tools don't pull their weight
+* SQL is a more general skill than ORMs and other tools should therefore mirror SQL
+* Mirroring live databases to get a schema is insane because are you tunneling to prod to run your linter? Live DB shouldn't be available to developers. Source of truth should be git.
 
 ## Installation & basic use
 
@@ -45,19 +52,21 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 
 ## What does & doesn't work
 
-* Adding tables, indexes and columns should mostly work
-* modifying primary keys doesn't work
-* modifying column types doesn't work (even something inoccuous like a default)
-* For diffs that are erroring, you can override with a [.manualmig.yml file](./.manualmig.yml)
-* Be careful with using unescaped keywords as names (i.e. a table named table) -- you'll likely confuse the parser even where your sql engine allows it
-* This hasn't been tested on a wide range of syntax (i.e. arrays / json)
-* Not sure if capitalized SQL keywords are supported (todo add tests)
-* Arbitrary whitespace changes can probably confuse the parser (todo add tests)
-* Anything that messes with the git history (like a rebase) is deeply confusing to this tool and will result in bad migrations. Workaround:
+* [x] Adding tables, indexes and columns should mostly work
+* [ ] modifying primary keys doesn't work
+* [ ] modifying column types doesn't work (even something inoccuous like a default)
+* [x] For diffs that are erroring, you can override with a [.manualmig.yml file](./.manualmig.yml)
+* [ ] Be careful with using unescaped keywords as names (i.e. a table named table) -- you'll likely confuse the parser even where your sql engine allows it
+* [ ] This hasn't been tested on a wide range of syntax (i.e. arrays / json)
+* [ ] Not sure if capitalized SQL keywords are supported (todo add tests)
+* [ ] Arbitrary whitespace changes can probably confuse the parser (todo add tests)
+* [ ] Anything that messes with the git history (like a rebase) is deeply confusing to this tool and will result in bad migrations. Workaround:
+    - **warning**: this method only works if the rebase doesn't change migrations
     - figure out the new sha that corresponds to your last old sha -- most likely you can do a `git show $OLDSHA` and then look for that commit msg in `git log`
     - and insert that corresponding sha into the `automigrate_meta` table: `psql -h 172.17.0.2 -U postgres -c "insert into automigrate (sha) values ('$NEWSHA')"`
     - you should be good to go
     - todo: find a way to automatically detect & recover from rebases
+    - todo: provide an `--opaque` argument that doesn't try to create granular changes for each commit in the history
 
 ## Comparison vs other tools
 
@@ -79,7 +88,7 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 
 Your ORM has to be willing to import a schema from create table statements. (I don't know any ORM that does this out of the box, although some can reflect a live DB, like [sqlalchemy's automap](https://docs.sqlalchemy.org/en/latest/orm/extensions/automap.html)).
 
-This repo contains a barebones, mostly untested harness to generate sqlalchemy models. You can run it with:
+This repo contains a barebones, mostly untested harness to [generate sqlalchemy models from create table statements](./automigrate/lib/sa_harness.py). You can run it with:
 
 ```bash
 python -m automigrate.lib.sa_harness 'test/schema/*.sql'
