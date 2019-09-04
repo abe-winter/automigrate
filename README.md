@@ -97,3 +97,12 @@ python -m automigrate.lib.sa_harness 'test/schema/*.sql'
 ```
 
 Happy to accept PRs to generate ORM defs from `create table` stmts (or vice versa).
+
+## Development workflow
+
+```bash
+# enable .envrc with `direnv allow` if necessary, or set up your own virtualenv
+# pip install -r requirements.txt
+pip install pytest
+pytest # in repo root
+```
