@@ -18,4 +18,5 @@ setup(
     'gitpython==2.1.11',
     'pyyaml==5.1',
   ],
+  python_requires='>=3.6', # for format strings
 )
