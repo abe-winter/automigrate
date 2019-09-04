@@ -34,7 +34,7 @@ This is beta software and you should be careful with its output.
 
 ## Installation & basic use
 
-To install, `pip install git+https://github.com/abe-winter/automigrate`. This should install dependencies and register the automig command in your virtualenv.
+To install, `pip install automig` (or use `pip3` if that fails). This should install dependencies and register the automig command.
 
 Typical invocations:
 
@@ -90,10 +90,10 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 
 Your ORM has to be willing to import a schema from create table statements. (I don't know any ORM that does this out of the box, although some can reflect a live DB, like [sqlalchemy's automap](https://docs.sqlalchemy.org/en/latest/orm/extensions/automap.html)).
 
-This repo contains a barebones, mostly untested harness to [generate sqlalchemy models from create table statements](./automigrate/lib/sa_harness.py). You can run it with:
+This repo contains a barebones, mostly untested harness to [generate sqlalchemy models from create table statements](./automig/lib/sa_harness.py). You can run it with:
 
 ```bash
-python -m automigrate.lib.sa_harness 'test/schema/*.sql'
+python -m automig.lib.sa_harness 'test/schema/*.sql'
 ```
 
 Happy to accept PRs to generate ORM defs from `create table` stmts (or vice versa).
