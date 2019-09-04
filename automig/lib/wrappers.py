@@ -6,6 +6,10 @@ class WrappedStatement:
   "base class"
   __slots__ = ('stmt',)
 
+  def __init__(self, stmt):
+    assert isinstance(stmt, sqlparse.sql.Statement)
+    self.stmt = stmt
+
   def __eq__(self, other):
     "yes this is the way adults compare parse trees"
     return str(self.stmt).strip() == str(other.stmt).strip()
@@ -61,9 +65,8 @@ class Column:
 
 class CreateTable(WrappedStatement):
   def __init__(self, stmt):
-    assert isinstance(stmt, sqlparse.sql.Statement)
     assert stmt.get_type() == 'CREATE'
-    self.stmt = stmt
+    super().__init__(stmt)
 
   def columns(self):
     decl = self.decl()
@@ -80,9 +83,8 @@ class CreateTable(WrappedStatement):
 
 class CreateIndex(WrappedStatement):
   def __init__(self, stmt):
-    assert isinstance(stmt, sqlparse.sql.Statement)
     assert stmt.get_type() == 'CREATE'
-    self.stmt = stmt
+    super().__init__(stmt)
 
   @property
   def index_name(self):
