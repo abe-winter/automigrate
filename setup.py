@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(
-  name='automigrate',
+  name='automig',
   version='0.0.1',
   description="Command to diff SQL schemas in git and apply the migrations",
   author="Abe Winter",
