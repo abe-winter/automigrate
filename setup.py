@@ -13,4 +13,9 @@ setup(
     'console_scripts': ['automig=automigrate.__main__:main'],
   },
   keywords=['sql', 'migration', 'git', 'diff'],
+  install_requires=[
+    'sqlparse==0.3.0',
+    'gitpython==2.1.11',
+    'pyyaml==5.1',
+  ],
 )
