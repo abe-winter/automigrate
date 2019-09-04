@@ -1,5 +1,5 @@
 import pytest, sqlparse
-from automigrate.lib import sa_harness, wrappers
+from automig.lib import sa_harness, wrappers
 
 def transform_string(string):
   "helper"

@@ -1,5 +1,5 @@
 import git, glob, pytest, sqlparse
-from automigrate.lib import githelp, ref_diff, diffing
+from automig.lib import githelp, ref_diff, diffing
 
 SHAS = {
   'create-t1': '218dd2c',
