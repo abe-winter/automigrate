@@ -36,6 +36,8 @@ This is beta software and you should be careful with its output.
 
 To install, `pip install automig` (or use `pip3` if that fails). This should install dependencies and register the automig command.
 
+You can fall back to `git+https://github.com/abe-winter/automigrate` if you want latest master.
+
 Typical invocations:
 
 ```bash
