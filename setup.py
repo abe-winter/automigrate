@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from distutils.core import setup
+from setuptools import find_packages
 
 setup(
   name='automig',
@@ -8,7 +9,7 @@ setup(
   description="Command to diff SQL schemas in git and apply the migrations",
   author="Abe Winter",
   url="https://github.com/abe-winter/automigrate",
-  packages=['automig'],
+  packages=find_packages(include=['automig', 'automig.*']),
   entry_points = {
     'console_scripts': ['automig=automig.__main__:main'],
   },
