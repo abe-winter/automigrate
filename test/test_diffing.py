@@ -44,3 +44,12 @@ def test_add_index():
 @pytest.mark.skip
 def test_all_caps_keywords():
   raise NotImplementedError
+
+NEWLINE = [
+  'create table whatever (\n  a int\n);',
+  'create table whatever (\n  a int,\n  b int\n);'
+]
+
+def test_newline():
+  # this isn't asserting anything -- checking for a bug which caused a crash
+  diffing.diff(*map(sqlparse.parse, NEWLINE))
