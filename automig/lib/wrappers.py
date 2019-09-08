@@ -23,6 +23,13 @@ class WrappedStatement:
     "return table name string"
     return self.decl().get_name()
 
+def iswhitespace(token):
+  # todo: learn more about this -- Token.Text.Whitespace.Newline, should I be testing ttype[2]?
+  return isinstance(token, sqlparse.sql.Token) \
+    and token.ttype \
+    and token.ttype[-1] == 'Whitespace'
+    # and (token.ttype[-1] == 'Whitespace' or token.ttype[-1] == 'Newline')
+
 def split_pun(tokens):
   """Takes a list of tokens and other stuff.
   Returns contiguous blocks of non-punctuation, i.e. list of lists.
@@ -34,7 +41,7 @@ def split_pun(tokens):
     if isinstance(tok, sqlparse.sql.Token) and tok.ttype and tok.ttype[0] == 'Punctuation':
       if groups[-1]: # i.e. if there's a non-empty group
         groups.append([])
-    elif isinstance(tok, sqlparse.sql.Token) and tok.ttype and tok.ttype[-1] == 'Whitespace':
+    elif iswhitespace(tok):
       pass
     elif isinstance(tok, sqlparse.sql.IdentifierList):
       # this is insane
