@@ -108,3 +108,5 @@ Happy to accept PRs to generate ORM defs from `create table` stmts (or vice vers
 pip install pytest
 pytest # in repo root
 ```
+
+If you want to pitch in on the project, there are a bunch of `@pytest.mark.skip` tests that need to be filled in (most require feature development to get them passing).
