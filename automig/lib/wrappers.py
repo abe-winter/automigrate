@@ -27,8 +27,7 @@ def iswhitespace(token):
   # todo: learn more about this -- Token.Text.Whitespace.Newline, should I be testing ttype[2]?
   return isinstance(token, sqlparse.sql.Token) \
     and token.ttype \
-    and token.ttype[-1] == 'Whitespace'
-    # and (token.ttype[-1] == 'Whitespace' or token.ttype[-1] == 'Newline')
+    and (token.ttype[-1] == 'Whitespace' or token.ttype[-1] == 'Newline')
 
 def split_pun(tokens):
   """Takes a list of tokens and other stuff.
