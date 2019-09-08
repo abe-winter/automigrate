@@ -22,6 +22,8 @@ This is beta software and you should be careful with its output.
 
 * Operates on `*.sql` files (i.e. files with `create table` and `create index` statements)
 * Operates on git -- meaning that it tracks the git version of applied migration and can create a SQL migration given two git refs
+* No need to write or store migrations for simple cases -- they're defined bidirectionally in terms of your git history
+* Ability to specify migrations manually when needed
 * Stores the history of applied migrations in sql in `automigrate_meta` table
 
 ## Philosophy
@@ -63,7 +65,8 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 * [ ] This hasn't been tested on a wide range of syntax (i.e. arrays / json)
 * [ ] Not sure if capitalized SQL keywords are supported (todo add tests)
 * [ ] Arbitrary whitespace changes can probably confuse the parser (todo add tests)
-* [ ] Need a way to test applied SQL against desired
+* [ ] Need a way to check live schema against desired to call out problems
+* [ ] undo, i.e. what would be 'down' in a typical migration tool. This may work out of the box (pass `HEAD...HEAD~1` instead of `HEAD~1...HEAD`), but needs tests
 * [ ] Anything that messes with the git history (like a rebase) is deeply confusing to this tool and will result in bad migrations. Workaround:
     - **warning**: this method only works if the rebase doesn't change migrations
     - figure out the new sha that corresponds to your last old sha -- most likely you can do a `git show $OLDSHA` and then look for that commit msg in `git log`
