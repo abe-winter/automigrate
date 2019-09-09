@@ -21,4 +21,6 @@ setup(
     'pyyaml==5.1',
   ],
   python_requires='>=3.6', # for format strings
+  long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
+  long_description_content_type='text/markdown',
 )
