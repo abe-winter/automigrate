@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
+import os
 from distutils.core import setup
 from setuptools import find_packages
 
 setup(
   name='automig',
-  version='0.0.2',
+  version=open(os.path.join(os.path.dirname(__file__), 'automig', 'VERSION')).read().strip(),
   description="Command to diff SQL schemas in git and apply the migrations",
   author="Abe Winter",
   url="https://github.com/abe-winter/automigrate",

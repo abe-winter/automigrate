@@ -9,10 +9,13 @@ import argparse, git, os, yaml
 from datetime import datetime
 from .lib import ref_diff, githelp
 
-PARSER = argparse.ArgumentParser(__doc__)
-PARSER.add_argument('ref', help="single git ref (i.e. sha) or sha1...sha2")
-PARSER.add_argument('glob', help="glob to grab paths, typicaly 'schema/*.sql' or something. use quotes so bash doesn't complete it")
-PARSER.add_argument('--initial', action='store_true', help="is this an initial commit (i.e. create metadata)")
+def build_parser():
+  version = open(os.path.join(os.path.dirname(__file__), 'VERSION')).read().strip()
+  parser = argparse.ArgumentParser(description=__doc__ + f" v{version}")
+  parser.add_argument('ref', help="single git ref (i.e. sha) or sha1...sha2")
+  parser.add_argument('glob', help="glob to grab paths, typicaly 'schema/*.sql' or something. use quotes so bash doesn't complete it")
+  parser.add_argument('--initial', action='store_true', help="is this an initial commit (i.e. create metadata)")
+  return parser
 
 # this creates the meta tables
 PREAMBLE = """
@@ -25,7 +28,7 @@ create table automigrate_meta (id serial primary key, sha text, applied timestam
 """
 
 def main():
-  args = PARSER.parse_args()
+  args = build_parser().parse_args()
   rev_tuple = githelp.parse_rev_to_tuple(args.ref)
   print(f'-- changeset created from {args} at {datetime.now()}')
   shas = []
