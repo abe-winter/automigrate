@@ -29,7 +29,7 @@ def get_paths(tree, pattern, root=()):
 
 def get_streams(tree, pattern):
   """given ref (git sha or reference as string) and glob (glob pattern as string)
-  return list of read()-ables for file contents
+  return list of file contents
   todo: support repos you're not inside of
   """
-  return [tree[path].data_stream for path in get_paths(tree, pattern)]
+  return [tree[path].data_stream.read() for path in get_paths(tree, pattern)]

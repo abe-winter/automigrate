@@ -3,11 +3,11 @@
 import sqlparse, collections
 from . import githelp, diffing
 
-def files_to_smts(readables):
-  "given a list of read()-able files, read them, parse them and return list of statements"
+def files_to_smts(fulltexts):
+  "given a list of file contents, read them, parse them and return list of statements"
   stmts = []
-  for readable in readables:
-    stmts.extend(sqlparse.parse(readable.read()))
+  for text in fulltexts:
+    stmts.extend(sqlparse.parse(text))
   return stmts
 
 def ref_diff(repo, ref1, ref2, pattern):
@@ -17,8 +17,8 @@ def ref_diff(repo, ref1, ref2, pattern):
     for ref in (ref1, ref2)
   )
   left, right = [
-    files_to_smts(readables)
-    for readables in contents
+    files_to_smts(fulltexts)
+    for fulltexts in contents
   ]
   return diffing.diff(left, right)
 
