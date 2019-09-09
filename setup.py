@@ -5,7 +5,7 @@ from setuptools import find_packages
 
 setup(
   name='automig',
-  version='0.0.1',
+  version='0.0.2',
   description="Command to diff SQL schemas in git and apply the migrations",
   author="Abe Winter",
   url="https://github.com/abe-winter/automigrate",
