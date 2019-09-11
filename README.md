@@ -66,7 +66,17 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 * [ ] Not sure if capitalized SQL keywords are supported (todo add tests)
 * [ ] Arbitrary whitespace changes can probably confuse the parser (todo add tests)
 * [ ] Need a way to check live schema against desired to call out problems
-* [ ] undo, i.e. what would be 'down' in a typical migration tool. This may work out of the box (pass `HEAD...HEAD~1` instead of `HEAD~1...HEAD`), but needs tests
+* undo, i.e. what would be 'down' in a typical migration tool.
+	- [ ] This may work out of the box (pass `HEAD...HEAD~1` instead of `HEAD~1...HEAD`), but needs tests
+	- [ ] up/down sections in .manualmig.yml
+* documentation for:
+	- [ ] writing schema files
+	- [ ] creating an initial migration
+	- [ ] checklist for running migrations: determining last sha, inspecting migration, running migration (postgres / mysql)
+	- [ ] resolving a rebase
+	- [ ] using manualmig when the tool is confused
+* [ ] add tool version to migrations table
+* [ ] design CI integration
 * [ ] add sql comments examples to the test suite
 * [ ] open design question: any reason to support non-DDL statements? what would this be used for?
 * [ ] Anything that messes with the git history (like a rebase) is deeply confusing to this tool and will result in bad migrations. Workaround:
