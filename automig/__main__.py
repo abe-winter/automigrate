@@ -37,7 +37,7 @@ def main():
     manual_mig = yaml.safe_load(open('.manualmig.yml'))['overrides']
   if args.initial:
     print(PREAMBLE)
-    commit = git.Repo().commit(rev_tuple[0])
+    commit = git.Repo(search_parent_directories=True).commit(rev_tuple[0])
     shas.append(commit.hexsha)
     tree = commit.tree
     assert len(rev_tuple) == 1, "can't pass a sha range for --initial"
@@ -45,7 +45,7 @@ def main():
       print(stream.read().decode())
   else:
     assert len(rev_tuple) == 2, "must pass a sha range or set --initial"
-    changes = ref_diff.ref_range_diff(git.Repo(), *rev_tuple, args.glob)
+    changes = ref_diff.ref_range_diff(git.Repo(search_parent_directories=True), *rev_tuple, args.glob)
     errors = ref_diff.extract_errors(changes)
     if errors:
       remaining = ref_diff.try_repair_errors(errors, manual_mig, changes)
