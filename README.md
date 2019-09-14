@@ -77,7 +77,6 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 	- [ ] using manualmig when the tool is confused
 * [ ] add tool version to migrations table
 * [ ] design CI integration
-* [ ] add sql comments examples to the test suite
 * [ ] open design question: any reason to support non-DDL statements? what would this be used for?
 * [ ] Anything that messes with the git history (like a rebase) is deeply confusing to this tool and will result in bad migrations. Workaround:
     - **warning**: this method only works if the rebase doesn't change migrations
