@@ -53,3 +53,12 @@ NEWLINE = [
 def test_newline():
   # this isn't asserting anything -- checking for a bug which caused a crash
   diffing.diff(*map(sqlparse.parse, NEWLINE))
+
+COMMENT = [
+  'create table whatever (\n  a int -- hello\n);',
+  'create table whatever (\n  a int, -- hello\n  b int\n);'
+]
+
+def test_comments():
+  # not asserting, just checking for crash
+  diffing.diff(*map(sqlparse.parse, COMMENT))
