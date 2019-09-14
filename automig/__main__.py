@@ -41,8 +41,8 @@ def main():
     shas.append(commit.hexsha)
     tree = commit.tree
     assert len(rev_tuple) == 1, "can't pass a sha range for --initial"
-    for stream in githelp.get_streams(tree, args.glob):
-      print(stream.read().decode())
+    for contents in githelp.get_streams(tree, args.glob):
+      print(contents.decode())
   else:
     assert len(rev_tuple) == 2, "must pass a sha range or set --initial"
     changes = ref_diff.ref_range_diff(git.Repo(search_parent_directories=True), *rev_tuple, args.glob)

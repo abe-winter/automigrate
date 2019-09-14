@@ -85,6 +85,7 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
     - you should be good to go
     - todo: find a way to automatically detect & recover from rebases
     - todo: provide an `--opaque` argument that doesn't try to create granular changes for each commit in the history
+* [ ] include `from_sha` in `automigrate_meta` table for audit trail
 
 ## Comparison vs other tools
 

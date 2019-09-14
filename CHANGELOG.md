@@ -2,6 +2,7 @@
 
 ## 0.0.x
 
+* 0.0.7 bugfix: --initial was broken by streams fix in 0.0.3
 * 0.0.6 bugfix: ignore comments
 * 0.0.5 bugfix: `search_parent_directories` so you don't have to run from repo root
 * 0.0.4 bugfix: 0.0.3 didn't bundle VERSION file correctly, crashed on load
