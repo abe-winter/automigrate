@@ -24,10 +24,9 @@ class WrappedStatement:
     return self.decl().get_name()
 
 def iswhitespace(token):
-  # todo: learn more about this -- Token.Text.Whitespace.Newline, should I be testing ttype[2]?
-  return isinstance(token, sqlparse.sql.Token) \
-    and token.ttype \
-    and (token.ttype[-1] == 'Whitespace' or token.ttype[-1] == 'Newline')
+  "for splitting purposes, is this ignorable? includes whitespace & comments"
+  # todo: do something else with comments, we probably want to decorate the parsed structure with special comments
+  return token.is_whitespace or isinstance(token, sqlparse.sql.Comment)
 
 def split_pun(tokens):
   """Takes a list of tokens and other stuff.
