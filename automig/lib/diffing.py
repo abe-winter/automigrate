@@ -37,6 +37,8 @@ def diff_stmt(left, right):
       if k in left_cols and left_cols[k] != right_cols[k]
     }
     if changed:
+      for a, b in changed.values(): print('toks', a.parse(), b.parse())
+      raise NotImplementedError("changed", changed)
       detail = {k: (a.render(), b.render()) for k, (a, b) in changed.items()}
       return [UnsupportedChange("we don't know how to change columns", detail)]
     for k in left_cols:

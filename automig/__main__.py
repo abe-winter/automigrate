@@ -48,6 +48,7 @@ def main():
     changes = ref_diff.ref_range_diff(git.Repo(search_parent_directories=True), *rev_tuple, args.glob)
     errors = ref_diff.extract_errors(changes)
     if errors:
+      # todo: this is wrong. manual_mig should override whether or not there are errors
       remaining = ref_diff.try_repair_errors(errors, manual_mig, changes)
       if remaining:
         raise ValueError('errors not overridden in .manualmig.yml', remaining)

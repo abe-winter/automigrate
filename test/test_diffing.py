@@ -25,9 +25,9 @@ def test_add_column():
   assert delta == {'t1': ['alter table t1 add column b int;']}
 
 MODIFY_COLUMN = [
-  'create table t1 (a int primary key, b int default 10, c text, d varchar(12));',
+  'create table t1 (a int primary key, b int default 10, c text, d varchar(12), e text);',
   # this is modifying a default, setting not nullable, and changing a varchar size
-  'create table t1 (a int primary key, b int default 20, c text not null, d varchar(24));',
+  'create table t1 (a int primary key, b int default 20, c text not null, d varchar(24), e text unique);',
 ]
 
 def test_modify_column():
