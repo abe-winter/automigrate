@@ -24,8 +24,23 @@ def test_add_column():
   delta = diffing.diff(*map(sqlparse.parse, ADD_COLUMN))
   assert delta == {'t1': ['alter table t1 add column b int;']}
 
-@pytest.mark.skip
+MODIFY_COLUMN = [
+  'create table t1 (a int primary key, b int default 10, c text, d varchar(12));',
+  # this is modifying a default, setting not nullable, and changing a varchar size
+  'create table t1 (a int primary key, b int default 20, c text not null, d varchar(24));',
+]
+
 def test_modify_column():
+  print(diffing.diff(*map(sqlparse.parse, MODIFY_COLUMN)))
+  raise NotImplementedError
+
+DROP_COLUMN = [
+  'create table t1 (a int primary key, b int, c int);',
+  'create table t1 (a int primary key, c int);',
+]
+
+def test_drop_column():
+  print(diffing.diff(*map(sqlparse.parse, DROP_COLUMN)))
   raise NotImplementedError
 
 @pytest.mark.skip

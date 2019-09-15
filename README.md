@@ -104,6 +104,7 @@ insert into automigrate_meta (sha) values ('b5b40ce718ea7241fee8d0a3826f244d21bf
     - todo: find a way to automatically detect & recover from rebases
     - todo: provide an `--opaque` argument that doesn't try to create granular changes for each commit in the history
 * [ ] include `from_sha` in `automigrate_meta` table for audit trail
+* [ ] I think you have to explicitly name your indexes (don't rely on the auto-generated DB ones)
 
 ## Comparison vs other tools
 
