@@ -39,7 +39,7 @@ def test_add_multi_commit():
 
 MOD_COLUMN = [
   'create table t1 (a int primary key, b int);',
-  'create table t1 (a int primary key, b int default 10);',
+  'create table t1 (a int primary key, b int unique);',
 ]
 
 def test_error_bubbling():
