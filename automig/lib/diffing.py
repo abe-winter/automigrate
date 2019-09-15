@@ -27,7 +27,7 @@ def diff_stmt(left, right):
   if isinstance(left, wrappers.CreateTable):
     left_cols = {col.name: col for col in left.columns()}
     right_cols = {col.name: col for col in right.columns()}
-    new_cols = [
+    changes = [
       f'alter table {table} add column {right_cols[k].render()};'
       for k in right_cols if k not in left_cols
     ]
@@ -39,9 +39,10 @@ def diff_stmt(left, right):
     if changed:
       detail = {k: (a.render(), b.render()) for k, (a, b) in changed.items()}
       return [UnsupportedChange("we don't know how to change columns", detail)]
-    if any(k not in right_cols for k in left_cols):
-      return [UnsupportedChange("we don't know how to drop columns")]
-    return new_cols
+    for k in left_cols:
+      if k not in right_cols:
+        changes.append(f'alter table {table} drop column {k};')
+    return changes
   else:
     raise DiffError("unhandled type", type(left))
 

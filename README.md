@@ -76,6 +76,7 @@ insert into automigrate_meta (sha) values ('b5b40ce718ea7241fee8d0a3826f244d21bf
 ## What does & doesn't work
 
 * [x] Adding tables, indexes and columns should mostly work
+* [x] drop column works
 * [ ] modifying primary keys doesn't work
 * [ ] modifying column types doesn't work (even something inoccuous like a default)
 * [x] For diffs that are erroring, you can override with a [.manualmig.yml file](./.manualmig.yml)

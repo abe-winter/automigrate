@@ -40,8 +40,8 @@ DROP_COLUMN = [
 ]
 
 def test_drop_column():
-  print(diffing.diff(*map(sqlparse.parse, DROP_COLUMN)))
-  raise NotImplementedError
+  delta = diffing.diff(*map(sqlparse.parse, DROP_COLUMN))
+  assert delta == {'t1': ['alter table t1 drop column b;']}
 
 @pytest.mark.skip
 def test_modify_key():
