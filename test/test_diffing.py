@@ -42,6 +42,11 @@ def test_diff_column():
   "directly test diff_column cases"
   raise NotImplementedError
 
+@pytest.mark.skip
+def test_column_parser():
+  "directly test wrappers.Column.parse() cases"
+  raise NotImplementedError
+
 DROP_COLUMN = [
   'create table t1 (a int primary key, b int, c int);',
   'create table t1 (a int primary key, c int);',
