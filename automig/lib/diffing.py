@@ -20,6 +20,30 @@ def group_by_table(stmts):
 class UnsupportedChange(Exception):
   "returned in place of a migration string when there's an error"
 
+def diff_column(table, left, right):
+  "return list of stmts to alter column, or UnsupportedChange if we're confused"
+  if not left.success or not right.success:
+    # todo: add details (column name and rendered old/new)
+    return [UnsupportedChange("the column parser failed on an alter")]
+  assert left.name == right.name
+  ret = []
+  prefix = f"alter table {table} alter column {left.name}"
+  if left.type != right.type:
+    ret.append(f"{prefix} type {right.type};")
+  if left.default != right.default:
+    if right.default is None:
+      ret.append(UnsupportedChange("can't unset default, file a bug and workaround by setting `default null` for now"))
+    else:
+      ret.append(f"{prefix} set default {right.default};")
+  if left.unique != right.unique:
+    ret.append(UnsupportedChange("can't modify uniqueness, file a bug"))
+  if left.not_null != right.not_null:
+    # note: I think the possible values here are (None | True), shouldn't ever be False
+    # todo: refactor this to `null` and include null / not_null as sources
+    # todo: this is assuming that 'not specified' is nullable -- link to DB docs supporting this and figure out the pkey case
+    ret.append(f"{prefix} {'set' if right.not_null else 'drop'} not null;")
+  return ret
+
 def diff_stmt(left, right):
   "diff two WrappedStmt with same unique key. return list of statements to run."
   assert left.unique == right.unique
@@ -27,7 +51,7 @@ def diff_stmt(left, right):
   if isinstance(left, wrappers.CreateTable):
     left_cols = {col.name: col for col in left.columns()}
     right_cols = {col.name: col for col in right.columns()}
-    new_cols = [
+    changes = [
       f'alter table {table} add column {right_cols[k].render()};'
       for k in right_cols if k not in left_cols
     ]
@@ -37,11 +61,12 @@ def diff_stmt(left, right):
       if k in left_cols and left_cols[k] != right_cols[k]
     }
     if changed:
-      detail = {k: (a.render(), b.render()) for k, (a, b) in changed.items()}
-      return [UnsupportedChange("we don't know how to change columns", detail)]
-    if any(k not in right_cols for k in left_cols):
-      return [UnsupportedChange("we don't know how to drop columns")]
-    return new_cols
+      for left_col, right_col in changed.values():
+        changes.extend(diff_column(table, left_col.parse(), right_col.parse()))
+    for k in left_cols:
+      if k not in right_cols:
+        changes.append(f'alter table {table} drop column {k};')
+    return changes
   else:
     raise DiffError("unhandled type", type(left))
 

@@ -53,6 +53,19 @@ def split_pun(tokens):
     groups.pop()
   return groups
 
+class ParsedColumn:
+  __slots__ = ('success', 'name', 'type', 'default', 'unique', 'not_null')
+  def __init__(self, success, name=None, type=None, default=None, unique=None, not_null=None):
+    self.success = success
+    self.name = name
+    self.type = type
+    self.default = default
+    self.unique = unique
+    self.not_null = not_null
+
+  def __repr__(self):
+    return f"<{self.__class__.__name__} {' '.join(map(lambda slot: f'{slot}={getattr(self, slot)}', self.__slots__))}>"
+
 class Column:
   def __init__(self, tokens):
     self.tokens = tokens
@@ -67,6 +80,29 @@ class Column:
 
   def render(self):
     return ' '.join(map(str, self.tokens))
+
+  def parse(self):
+    "return a ParsedColumn. This is rudimentary and will fail on hard cases"
+    name, *tokens = self.tokens
+    if not isinstance(name, sqlparse.sql.Identifier):
+      return ParsedColumn(False)
+    type_, *tokens = tokens
+    if not isinstance(type_, sqlparse.sql.Function) and type_.ttype[-1] != 'Builtin':
+      return ParsedColumn(False)
+    success = ParsedColumn(True, name.value, type_.value)
+    while tokens:
+      if tokens[0].ttype and tokens[0].ttype[-1] == 'Keyword' and tokens[0].normalized.lower() == 'default':
+        _, val, *tokens = tokens
+        success.default = val.value
+      elif tokens[0].ttype and tokens[0].ttype[-1] == 'Keyword' and tokens[0].normalized.lower() == 'not null':
+        _, *tokens = tokens
+        success.not_null = True
+      elif tokens[0].ttype and tokens[0].ttype[-1] == 'Keyword' and tokens[0].normalized.lower() == 'unique':
+        _, *tokens = tokens
+        success.unique = True
+      else:
+        return ParsedColumn(False)
+    return success
 
 class CreateTable(WrappedStatement):
   def __init__(self, stmt):

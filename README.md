@@ -76,8 +76,9 @@ insert into automigrate_meta (sha) values ('b5b40ce718ea7241fee8d0a3826f244d21bf
 ## What does & doesn't work
 
 * [x] Adding tables, indexes and columns should mostly work
+* [x] drop column works
+* [x] modifying columns partially works, supports changes to types, defaults, nullable. Read the `diff_column()` function for up-to-date information and file bugs for specific holes.
 * [ ] modifying primary keys doesn't work
-* [ ] modifying column types doesn't work (even something inoccuous like a default)
 * [x] For diffs that are erroring, you can override with a [.manualmig.yml file](./.manualmig.yml)
 * [ ] Be careful with using unescaped keywords as names (i.e. a table named table) -- you'll likely confuse the parser even where your sql engine allows it
 * [ ] This hasn't been tested on a wide range of syntax (i.e. arrays / json)
@@ -104,6 +105,7 @@ insert into automigrate_meta (sha) values ('b5b40ce718ea7241fee8d0a3826f244d21bf
     - todo: find a way to automatically detect & recover from rebases
     - todo: provide an `--opaque` argument that doesn't try to create granular changes for each commit in the history
 * [ ] include `from_sha` in `automigrate_meta` table for audit trail
+* [ ] I think you have to explicitly name your indexes (don't rely on the auto-generated DB ones)
 
 ## Comparison vs other tools
 
