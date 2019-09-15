@@ -7,6 +7,7 @@ Use this if you don't like to manage migrations separately from your declarative
 * [Warning this is beta software](#beta-software)
 * [Features](#features)
 * [Installation & basic use](#installation--basic-use)
+* [What's happening under the covers](#whats-happening-under-the-covers)
 * [What does & doesn't work](#what-does--doesnt-work)
 * [Comparison vs other tools](#comparison-vs-other-tools)
 * [Using with ORMs](#using-with-orms)
@@ -22,6 +23,7 @@ This is beta software and you should be careful with its output.
 
 * Operates on `*.sql` files (i.e. files with `create table` and `create index` statements)
 * Operates on git -- meaning that it tracks the git version of applied migration and can create a SQL migration given two git refs
+* Outputs migrations as SQL
 * No need to write or store migrations for simple cases -- they're defined bidirectionally in terms of your git history
 * Ability to specify migrations manually when needed
 * Stores the history of applied migrations in sql in `automigrate_meta` table
@@ -53,6 +55,22 @@ automig $LAST_SHA...b5b40ce 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres
 
 # I guess you can just migrate to HEAD if you're feeling lucky
 automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --single-transaction
+```
+
+## What's happening under the covers
+
+Nothing fancy. When you run `automig 218dd2c...b5b40ce 'test/schema/*.sql'` (these are real SHAs in this git repo and will work if you clone the repo), it outputs:
+
+```sql
+-- changeset created from Namespace(glob='test/schema/*.sql', initial=False, ref='218dd2c...b5b40ce') at 2019-09-14 22:15:55.421146
+-- changes for 9dcbd4e.t1
+alter table t1 add column b int;
+-- changes for b5b40ce.t1
+create index t1a on t1 (a);
+-- changes for b5b40ce.t2
+create table t2 (a int primary key);
+insert into automigrate_meta (sha) values ('9dcbd4e81e9a0dd7629ed7ae82a86891a88f76f3');
+insert into automigrate_meta (sha) values ('b5b40ce718ea7241fee8d0a3826f244d21bf413c');
 ```
 
 ## What does & doesn't work
@@ -89,19 +107,10 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 
 ## Comparison vs other tools
 
-* alembic / other auto migration generators
-	- they're generally language-specific and ORM-specific, this isn't
-	- they're not git-aware so you need to manage migration files
-	- they can usually connect to your DB -- this is designed to be run directly as SQL
-* apex sql diff
-	- they can operate on 'script folders' and integrate with source control
-	- not sure what this means in practice
-	- I think this product is GUI-first and only runs on windows?
-* sqlite sqldiff.exe
-	- seems like a really good tool if you're operating on sqlite databases
-* liquibase
-	- supports 4 formats for migration (xml, yml, json, sql) -- this supports 0 because it doesn't need them
-	- requires you to explictly define migrations (I think) -- this doesn't
+* [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html), as far as I can tell, requires you to generate a skeleton python file then fill it in yourself
+* [sqlite sqldiff.exe](https://www.sqlite.org/sqldiff.html) can diff schemas but operates on full sqlite databases and I'm not sure if it outputs DDL
+* liquibase might have a [diffing system](https://www.liquibase.org/documentation/diff.html) but from the docs it looks like it's outputting XML. And [they advise you not to use it](http://www.liquibase.org/2007/06/the-problem-with-database-diffs.html)
+* [redgate sql compare](https://documentation.red-gate.com/sc/sql-server-management-studio-add-in/getting-started-with-the-add-in) seems to support comparing 'create table' schemas across git versions, although it looks like you have to find the SHAs by hand in a GUI
 
 ## Using with ORMs
 
