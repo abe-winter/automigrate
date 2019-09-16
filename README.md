@@ -143,6 +143,7 @@ This is how I would apply migrations in CI if I had a few weeks off to build too
   - Unlock the automatic deployment when the migration has successfully applied
   - Alert / page on error applying
   - Some migrations may require downtime for part or all of your cluster -- these migrations probably won't be automatic
+  - Note that the order of new code & migration depends on the contents of the migration. [This staffjoy post](https://blog.staffjoy.com/dont-migrate-databases-automatically-5039ab061365?gi=3451f6178158#5822) points out that with ORMs that select all columns, `add column` & `drop column` can both be done with 0 downtime, but drop column migrations must be applied **after** the new code is out
 
 ## Development workflow
 
