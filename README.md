@@ -11,6 +11,7 @@ Use this if you don't like to manage migrations separately from your declarative
 * [What does & doesn't work](#what-does--doesnt-work)
 * [Comparison vs other tools](#comparison-vs-other-tools)
 * [Using with ORMs](#using-with-orms)
+* [Integrating with CI](#integrating-with-ci)
 
 ## Beta software
 
@@ -125,6 +126,23 @@ python -m automig.lib.sa_harness 'test/schema/*.sql'
 ```
 
 Happy to accept PRs to generate ORM defs from `create table` stmts (or vice versa).
+
+## Integrating with CI
+
+This is how I would apply migrations in CI if I had a few weeks off to build tooling. If you try this & it works, let me know.
+
+* Flag the migration in your code review tool before merging the change to master
+  - Ideally the CR tool would run automig against master branch and show automig's output so the reviewer can sign off
+  - In lieu of complex CR improvements, you can run automig in your CI testing tool
+* Detect that a migration needs to be applied when deploying
+  - This means that your deploy bot needs to have access to your prod DB
+  - For continuous automatic deployment setups, you may want to block auto deploy for and require explicit signoff for deploys which require a migration
+  - Alert / page in the appropriate place when a deploy is held because it has a migration
+* Apply the migration from deploy CI
+  - To be safe, this requires an exactly-once semantic
+  - Unlock the automatic deployment when the migration has successfully applied
+  - Alert / page on error applying
+  - Some migrations may require downtime for part or all of your cluster -- these migrations probably won't be automatic
 
 ## Development workflow
 
