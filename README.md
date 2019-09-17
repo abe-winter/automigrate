@@ -108,10 +108,12 @@ insert into automigrate_meta (sha) values ('b5b40ce718ea7241fee8d0a3826f244d21bf
 
 ## Comparison vs other tools
 
-* [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html), as far as I can tell, requires you to generate a skeleton python file then fill it in yourself
+* [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html), as far as I can tell, requires you to generate a skeleton python file for each change then fill it in yourself
 * [sqlite sqldiff.exe](https://www.sqlite.org/sqldiff.html) can diff schemas but operates on full sqlite databases and I'm not sure if it outputs DDL
 * liquibase might have a [diffing system](https://www.liquibase.org/documentation/diff.html) but from the docs it looks like it's outputting XML. And [they advise you not to use it](http://www.liquibase.org/2007/06/the-problem-with-database-diffs.html)
 * [redgate sql compare](https://documentation.red-gate.com/sc/sql-server-management-studio-add-in/getting-started-with-the-add-in) seems to support comparing 'create table' schemas across git versions, although it looks like you have to find the SHAs by hand in a GUI
+* [migra](https://github.com/djrobstep/migra) seems to require two live DBs to run a diff (one with current schema, one with new)
+* [sqitch](https://sqitch.org) seems to require manually specifying `deploy` sql (and optionally `revert` & `verify`)
 
 ## Using with ORMs
 
