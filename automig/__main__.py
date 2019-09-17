@@ -34,6 +34,7 @@ def main():
   shas = []
   manual_mig = {}
   if os.path.exists('.manualmig.yml'):
+    # todo: read this from repo root, not cwd
     manual_mig = yaml.safe_load(open('.manualmig.yml'))['overrides']
   if args.initial:
     print(PREAMBLE)

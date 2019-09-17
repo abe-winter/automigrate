@@ -20,11 +20,11 @@ def group_by_table(stmts):
 class UnsupportedChange(Exception):
   "returned in place of a migration string when there's an error"
 
-def diff_column(table, left, right):
+def diff_column(table, colname, left, right):
   "return list of stmts to alter column, or UnsupportedChange if we're confused"
   if not left.success or not right.success:
     # todo: add details (column name and rendered old/new)
-    return [UnsupportedChange("the column parser failed on an alter")]
+    return [UnsupportedChange(f"the column parser failed on new or old change for col {colname}")]
   assert left.name == right.name
   ret = []
   prefix = f"alter table {table} alter column {left.name}"
@@ -62,7 +62,7 @@ def diff_stmt(left, right):
     }
     if changed:
       for left_col, right_col in changed.values():
-        changes.extend(diff_column(table, left_col.parse(), right_col.parse()))
+        changes.extend(diff_column(table, left_col.name, left_col.parse(), right_col.parse()))
     for k in left_cols:
       if k not in right_cols:
         changes.append(f'alter table {table} drop column {k};')

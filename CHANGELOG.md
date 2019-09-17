@@ -2,6 +2,7 @@
 
 ## 0.0.x
 
+* 0.0.9 bugfix: support jsonb and array types in alter parser
 * 0.0.8 feature: drop & alter column
 * 0.0.7 bugfix: --initial was broken by streams fix in 0.0.3
 * 0.0.6 bugfix: ignore comments

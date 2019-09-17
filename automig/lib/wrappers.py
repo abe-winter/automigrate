@@ -87,19 +87,23 @@ class Column:
     if not isinstance(name, sqlparse.sql.Identifier):
       return ParsedColumn(False)
     type_, *tokens = tokens
-    if not isinstance(type_, sqlparse.sql.Function) and type_.ttype[-1] != 'Builtin':
+    if not isinstance(type_, sqlparse.sql.Function) and type_.ttype[-1] not in ('Builtin', 'Keyword'):
       return ParsedColumn(False)
     success = ParsedColumn(True, name.value, type_.value)
+    if tokens and isinstance(tokens[0], sqlparse.sql.SquareBrackets):
+      brackets, *tokens = tokens
+      success.type += brackets.value
     while tokens:
-      if tokens[0].ttype and tokens[0].ttype[-1] == 'Keyword' and tokens[0].normalized.lower() == 'default':
-        _, val, *tokens = tokens
-        success.default = val.value
-      elif tokens[0].ttype and tokens[0].ttype[-1] == 'Keyword' and tokens[0].normalized.lower() == 'not null':
-        _, *tokens = tokens
-        success.not_null = True
-      elif tokens[0].ttype and tokens[0].ttype[-1] == 'Keyword' and tokens[0].normalized.lower() == 'unique':
-        _, *tokens = tokens
-        success.unique = True
+      if tokens[0].ttype and tokens[0].ttype[-1] == 'Keyword':
+        if tokens[0].normalized.lower() == 'default':
+          _, val, *tokens = tokens
+          success.default = val.value
+        elif tokens[0].normalized.lower() == 'not null':
+          _, *tokens = tokens
+          success.not_null = True
+        elif tokens[0].normalized.lower() == 'unique':
+          _, *tokens = tokens
+          success.unique = True
       else:
         return ParsedColumn(False)
     return success

@@ -84,7 +84,6 @@ insert into automigrate_meta (sha) values ('b5b40ce718ea7241fee8d0a3826f244d21bf
 * [ ] Be careful with using unescaped keywords as names (i.e. a table named table) -- you'll likely confuse the parser even where your sql engine allows it
 * [ ] This hasn't been tested on a wide range of syntax (i.e. arrays / json)
 * [ ] Not sure if capitalized SQL keywords are supported (todo add tests)
-* [ ] Arbitrary whitespace changes can probably confuse the parser (todo add tests)
 * [ ] Need a way to check live schema against desired to call out problems
 * undo, i.e. what would be 'down' in a typical migration tool.
 	- [ ] This may work out of the box (pass `HEAD...HEAD~1` instead of `HEAD~1...HEAD`), but needs tests
@@ -95,9 +94,9 @@ insert into automigrate_meta (sha) values ('b5b40ce718ea7241fee8d0a3826f244d21bf
 	- [ ] checklist for running migrations: determining last sha, inspecting migration, running migration (postgres / mysql)
 	- [ ] resolving a rebase
 	- [ ] using manualmig when the tool is confused
-* [ ] add tool version to migrations table
-* [ ] design CI integration
-* [ ] open design question: any reason to support non-DDL statements? what would this be used for?
+* `automigrate_meta` table
+	* [ ] column for automig VERSION string
+	* [ ] column for `from_sha`
 * [ ] Anything that messes with the git history (like a rebase) is deeply confusing to this tool and will result in bad migrations. Workaround:
     - **warning**: this method only works if the rebase doesn't change migrations
     - figure out the new sha that corresponds to your last old sha -- most likely you can do a `git show $OLDSHA` and then look for that commit msg in `git log`
@@ -105,7 +104,6 @@ insert into automigrate_meta (sha) values ('b5b40ce718ea7241fee8d0a3826f244d21bf
     - you should be good to go
     - todo: find a way to automatically detect & recover from rebases
     - todo: provide an `--opaque` argument that doesn't try to create granular changes for each commit in the history
-* [ ] include `from_sha` in `automigrate_meta` table for audit trail
 * [ ] I think you have to explicitly name your indexes (don't rely on the auto-generated DB ones)
 
 ## Comparison vs other tools
