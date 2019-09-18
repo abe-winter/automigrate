@@ -63,6 +63,12 @@ class ParsedColumn:
     self.unique = unique
     self.not_null = not_null
 
+  def __eq__(self, other):
+    if not isinstance(other, self.__class__):
+      return False
+    return tuple(map(lambda slot: getattr(self, slot), self.__slots__)) == \
+      tuple(map(lambda slot: getattr(other, slot), other.__slots__))
+
   def __repr__(self):
     return f"<{self.__class__.__name__} {' '.join(map(lambda slot: f'{slot}={getattr(self, slot)}', self.__slots__))}>"
 
