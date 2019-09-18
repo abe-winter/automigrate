@@ -108,6 +108,7 @@ insert into automigrate_meta (sha) values ('b5b40ce718ea7241fee8d0a3826f244d21bf
 
 ## Comparison vs other tools
 
+* [prisma lift](https://github.com/prisma/lift) has a declarative schema which *isn't* sql but looks kind of like it, and depends on a runtime DB to generate the migration diff, but seems like a neat tool
 * [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html), as far as I can tell, requires you to generate a skeleton python file for each change then fill it in yourself
 * [sqlite sqldiff.exe](https://www.sqlite.org/sqldiff.html) can diff schemas but operates on full sqlite databases and I'm not sure if it outputs DDL
 * liquibase might have a [diffing system](https://www.liquibase.org/documentation/diff.html) but from the docs it looks like it's outputting XML. And [they advise you not to use it](http://www.liquibase.org/2007/06/the-problem-with-database-diffs.html)
