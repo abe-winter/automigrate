@@ -7,7 +7,7 @@ from setuptools import find_packages
 setup(
   name='automig',
   version=open(os.path.join(os.path.dirname(__file__), 'automig', 'VERSION')).read().strip(),
-  description="Command to diff SQL schemas in git and apply the migrations",
+  description="Declarative, automatic db migrations using SQL & git as the source of truth",
   author="Abe Winter",
   url="https://github.com/abe-winter/automigrate",
   packages=find_packages(include=['automig', 'automig.*']),
