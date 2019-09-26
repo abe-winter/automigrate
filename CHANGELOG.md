@@ -3,7 +3,7 @@
 ## 0.0.x
 
 * 0.0.10
-  - bugfix: permit invocations outside repo root; fix in 0.0.5 fixed the crash didn't make glob relative
+  - bugfix: permit invocations outside repo root; fix in 0.0.5 fixed the crash but didn't make glob relative
   - near-breaking change: automigrate_meta new columns, you have to pass --update-meta the first time this runs or do `automig HEAD...HEAD . --update-meta`
   - version bump: automigrate_meta_meta version 3
 * 0.0.9 bugfix: support jsonb and array types in alter parser

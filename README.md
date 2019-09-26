@@ -63,15 +63,15 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 Nothing fancy. When you run `automig 218dd2c...b5b40ce 'test/schema/*.sql'` (these are real SHAs in this git repo and will work if you clone the repo), it outputs:
 
 ```sql
--- changeset created from Namespace(glob='test/schema/*.sql', initial=False, ref='218dd2c...b5b40ce') at 2019-09-14 22:15:55.421146
+-- changeset created from Namespace(glob='test/schema/*.sql', initial=False, opaque=False, ref='218dd2c...b5b40ce', update_meta=False) at 2019-09-26 01:57:58.404722
 -- changes for 9dcbd4e.t1
 alter table t1 add column b int;
 -- changes for b5b40ce.t1
 create index t1a on t1 (a);
 -- changes for b5b40ce.t2
 create table t2 (a int primary key);
-insert into automigrate_meta (sha) values ('9dcbd4e81e9a0dd7629ed7ae82a86891a88f76f3');
-insert into automigrate_meta (sha) values ('b5b40ce718ea7241fee8d0a3826f244d21bf413c');
+insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ('218dd2c', '9dcbd4e81e9a0dd7629ed7ae82a86891a88f76f3', '0.0.10', false);
+insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ('9dcbd4e81e9a0dd7629ed7ae82a86891a88f76f3', 'b5b40ce718ea7241fee8d0a3826f244d21bf413c', '0.0.10', false);
 ```
 
 ## What does & doesn't work
@@ -94,18 +94,13 @@ insert into automigrate_meta (sha) values ('b5b40ce718ea7241fee8d0a3826f244d21bf
 	- [ ] creating an initial migration
 	- [ ] checklist for running migrations: determining last sha, inspecting migration, running migration (postgres / mysql)
 	- [ ] resolving a rebase
+  - [ ] troubleshoot and resolve automigrate_meta errors
 	- [ ] using manualmig when the tool is confused
-* `automigrate_meta` table
-	* [ ] column for automig VERSION string
-	* [ ] column for `from_sha`
-* [ ] Anything that messes with the git history (like a rebase) is deeply confusing to this tool and will result in bad migrations. Workaround:
-    - **warning**: this method only works if the rebase doesn't change migrations
-    - figure out the new sha that corresponds to your last old sha -- most likely you can do a `git show $OLDSHA` and then look for that commit msg in `git log`
-    - and insert that corresponding sha into the `automigrate_meta` table: `psql -h 172.17.0.2 -U postgres -c "insert into automigrate (sha) values ('$NEWSHA')"`
-    - you should be good to go
-    - todo: find a way to automatically detect & recover from rebases
-    - todo: provide an `--opaque` argument that doesn't try to create granular changes for each commit in the history
-* [ ] I think you have to explicitly name your indexes (don't rely on the auto-generated DB ones)
+* [ ] `--opaque` flag to repair non-linear git history (rebase)
+
+## Burndown
+
+* [ ] [0.2.0] integration test with mysql and postgres
 
 ## Comparison vs other tools
 
