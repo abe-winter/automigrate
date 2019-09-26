@@ -13,18 +13,31 @@ def build_parser():
   version = open(os.path.join(os.path.dirname(__file__), 'VERSION')).read().strip()
   parser = argparse.ArgumentParser(description=__doc__ + f" v{version}")
   parser.add_argument('ref', help="single git ref (i.e. sha) or sha1...sha2")
-  parser.add_argument('glob', help="glob to grab paths, typicaly 'schema/*.sql' or something. use quotes so bash doesn't complete it")
+  parser.add_argument('glob', help="glob to grab paths, typicaly 'schema/*.sql' or something. use single-quotes so bash doesn't complete it")
   parser.add_argument('--initial', action='store_true', help="is this an initial commit (i.e. create metadata)")
+  parser.add_argument('--update-meta', action='store_true', help="apply / update the preamble; this may only work with postgres")
   return parser
 
 # this creates the meta tables
 PREAMBLE = """
--- meta_meta stores the meta version (obviously)
-create table automigrate_meta_meta (id serial primary key, meta_version int);
-insert into automigrate_meta_meta (meta_version) values (1);
+-- meta_meta stores the meta version
+create table automigrate_meta_meta (id serial primary key, meta_version int, applied timestamp default now());
+insert into automigrate_meta_meta (meta_version) values (2);
 
 -- meta stores the schema version
-create table automigrate_meta (id serial primary key, sha text, applied timestamp default now());
+create table automigrate_meta (id serial primary key, sha text, applied timestamp default now(), fromsha text, opaque bool);
+"""
+
+POSTGRES_PREAMBLE = """
+-- meta_meta stores the meta version
+create table if not exists automigrate_meta_meta (id serial primary key, meta_version int);
+alter tabel automigrate_meta_meta add column if not exists applied timestamp default now();
+insert into automigrate_meta_meta (meta_version) values (2);
+
+-- meta stores the schema version
+create table if not exists automigrate_meta (id serial primary key, sha text, applied timestamp default now());
+alter table automigrate_meta add column if not exists fromsha text;
+alter table automigrate_meta add column if not exists opaque bool;
 """
 
 def main():
@@ -53,6 +66,8 @@ def main():
       remaining = ref_diff.try_repair_errors(errors, manual_mig, changes)
       if remaining:
         raise ValueError('errors not overridden in .manualmig.yml', remaining)
+    if args.update_meta:
+      print(POSTGRES_PREAMBLE)
     for sha, tables in changes.items():
       shas.append(sha)
       for table, stmts in tables.items():
