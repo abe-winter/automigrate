@@ -18,7 +18,6 @@ def get_paths(tree, pattern, root=()):
   found = []
   for item in tree:
     if isinstance(item, git.Blob):
-      # todo: this needs testing strategy in repo root and subdir
       if fnmatch.fnmatch(item.abspath, pattern):
         found.append(item.path)
     elif isinstance(item, git.Tree):

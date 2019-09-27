@@ -51,12 +51,12 @@ def main():
   print(f'-- changeset created from {args} at {datetime.now()}')
   shas = []
   manual_mig = {}
-  if args.opaque:
-    raise NotImplementedError("opaque mode not supported yet")
   if os.path.exists('.manualmig.yml'):
     # todo: read this from repo root, not cwd
     manual_mig = yaml.safe_load(open('.manualmig.yml'))['overrides']
   if args.initial:
+    if args.opaque:
+      raise ValueError("don't pass --opaque with --initial")
     shas.append(None)
     print(PREAMBLE)
     commit = git.Repo(search_parent_directories=True).commit(rev_tuple[0])
@@ -69,7 +69,7 @@ def main():
     assert len(rev_tuple) == 2, "must pass a sha range or set --initial"
     # todo: look up rev_tuple[0] so this isn't a short sha or HEAD~1 or something
     shas.append(rev_tuple[0])
-    changes = ref_diff.ref_range_diff(git.Repo(search_parent_directories=True), *rev_tuple, args.glob)
+    changes = ref_diff.ref_range_diff(git.Repo(search_parent_directories=True), *rev_tuple, args.glob, opaque=args.opaque)
     errors = ref_diff.extract_errors(changes)
     if errors:
       # todo: this is wrong. manual_mig should override whether or not there are errors

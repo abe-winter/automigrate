@@ -37,6 +37,13 @@ def test_add_multi_commit():
     },
   }
 
+def test_add_multi_commit_opaque():
+  diff = ref_diff.ref_range_diff(git.Repo(), SHAS['create-t1'], SHAS['add-t2-t1a'], GLOB, opaque=True)
+  assert diff == {SHAS['add-t2-t1a']: {
+    't1': ['alter table t1 add column b int;', 'create index t1a on t1 (a);'],
+    't2': ['create table t2 (a int primary key);'],
+  }}
+
 MOD_COLUMN = [
   'create table t1 (a int primary key, b int);',
   'create table t1 (a int primary key, b int unique);',

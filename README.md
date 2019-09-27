@@ -81,26 +81,26 @@ insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ('9d
 * [x] modifying columns partially works, supports changes to types, defaults, nullable. Read the `diff_column()` function for up-to-date information and file bugs for specific holes.
 * [ ] modifying primary keys doesn't work
 * [x] For diffs that are erroring, you can override with a [.manualmig.yml file](./.manualmig.yml)
-* [ ] I think `...` syntax is actually `..` -- in cases where this matters (`master...branch`, or any `A...B` where A isn't the common ancestor of A & B), automig will be wrong. This needs to be fixed before 0.1
 * [ ] Be careful with using unescaped keywords as names (i.e. a table named table) -- you'll likely confuse the parser even where your sql engine allows it
 * [ ] This hasn't been tested on a wide range of syntax (i.e. arrays / json)
 * [ ] Not sure if capitalized SQL keywords are supported (todo add tests)
 * [ ] Need a way to check live schema against desired to call out problems
 * undo, i.e. what would be 'down' in a typical migration tool.
-	- [ ] This may work out of the box (pass `HEAD...HEAD~1` instead of `HEAD~1...HEAD`), but needs tests
-	- [ ] up/down sections in .manualmig.yml
+  - [ ] This may work out of the box (pass `HEAD...HEAD~1` instead of `HEAD~1...HEAD`), but needs tests
+  - [ ] up/down sections in .manualmig.yml
 * documentation for:
-	- [ ] writing schema files
-	- [ ] creating an initial migration
-	- [ ] checklist for running migrations: determining last sha, inspecting migration, running migration (postgres / mysql)
-	- [ ] resolving a rebase
-  - [ ] troubleshoot and resolve automigrate_meta errors
-	- [ ] using manualmig when the tool is confused
-* [ ] `--opaque` flag to repair non-linear git history (rebase)
+  - [ ] writing schema files
+  - [ ] creating an initial migration
+  - [ ] checklist for running migrations: determining last sha, inspecting migration, running migration (postgres / mysql)
+  - [ ] resolving a rebase
+  - [ ] troubleshoot and resolve `automigrate_meta` errors
+  - [ ] using manualmig when the tool is confused
+* [x] `--opaque` flag to repair non-linear git history (i.e. rebase)
 
 ## Burndown
 
 * [ ] [0.2.0] integration test with mysql and postgres
+* [ ] [0.2.0] take more than one glob
 
 ## Comparison vs other tools
 
