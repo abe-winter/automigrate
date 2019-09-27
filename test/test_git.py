@@ -1,4 +1,4 @@
-import git, glob, pytest, sqlparse
+import git, glob, pytest, sqlparse, os
 from automig.lib import githelp, ref_diff, diffing
 
 SHAS = {
@@ -10,13 +10,13 @@ SHAS = {
 GLOB ='test/schema/*.sql'
 
 def test_get_paths():
-  tree = git.Repo().commit(SHAS['create-t1']).tree
-  assert githelp.get_paths(tree, GLOB) == ['test/schema/sql.sql']
+  repo = git.Repo()
+  tree = repo.commit(SHAS['create-t1']).tree
+  assert githelp.get_paths(tree, os.path.join(repo.working_dir, GLOB)) == ['test/schema/sql.sql']
 
 @pytest.mark.skip
 def test_create():
   diff = ref_diff.ref_range_diff(git.Repo(), SHAS['create-t1'], SHAS['add-t1-col'], GLOB)
-  print('diff', diff)
   raise NotImplementedError
 
 def test_addcol():
