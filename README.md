@@ -101,6 +101,8 @@ insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ('9d
 
 * [ ] [0.2.0] integration test with mysql and postgres
 * [ ] [0.2.0] take more than one glob
+* [ ] [0.2.0] support 'create extension'
+* [ ] [0.2.0] support enums
 
 ## Comparison vs other tools
 
