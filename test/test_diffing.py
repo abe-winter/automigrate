@@ -62,6 +62,10 @@ def test_column_parser():
   # make sure it doesn't treat 'primary key' as a column
   assert [col.name for col in wrappers.wrap(sqlparse.parse("create table t1 (a int, b int, primary key (a,b))")[0]).columns()] == ['a', 'b']
 
+def test_pkey_fields():
+  assert ['a'] == wrappers.wrap(sqlparse.parse("create table t1 (a int primary key, b int)")[0]).pkey_fields()
+  assert ['a', 'b'] == wrappers.wrap(sqlparse.parse("create table t1 (a int, b int, primary key (a,b))")[0]).pkey_fields()
+
 DROP_COLUMN = [
   'create table t1 (a int primary key, b int, c int);',
   'create table t1 (a int primary key, c int);',
