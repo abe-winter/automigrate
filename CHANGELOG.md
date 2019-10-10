@@ -2,6 +2,7 @@
 
 ## 0.0.x
 
+* 0.0.12 bugfix: support separate `primary key ()` tuple in `create table`
 * 0.0.11 feature: --opaque flag for resolving messy git histories
 * 0.0.10
   - bugfix: permit invocations outside repo root; fix in 0.0.5 fixed the crash but didn't make glob relative
