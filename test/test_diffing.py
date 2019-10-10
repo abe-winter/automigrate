@@ -59,6 +59,12 @@ def test_column_parser():
     assert parse_column(type_ + ' default 20') == wrappers.ParsedColumn(True, 'x', type_, default='20')
     assert parse_column(type_ + " default 'hello'") == wrappers.ParsedColumn(True, 'x', type_, default="'hello'")
     assert parse_column(type_ + ' not null unique default 20') == wrappers.ParsedColumn(True, 'x', type_, not_null=True, unique=True, default='20')
+  # make sure it doesn't treat 'primary key' as a column
+  assert [col.name for col in wrappers.wrap(sqlparse.parse("create table t1 (a int, b int, primary key (a,b))")[0]).columns()] == ['a', 'b']
+
+def test_pkey_fields():
+  assert ['a'] == wrappers.wrap(sqlparse.parse("create table t1 (a int primary key, b int)")[0]).pkey_fields()
+  assert ['a', 'b'] == wrappers.wrap(sqlparse.parse("create table t1 (a int, b int, primary key (a,b))")[0]).pkey_fields()
 
 DROP_COLUMN = [
   'create table t1 (a int primary key, b int, c int);',

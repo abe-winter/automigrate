@@ -54,16 +54,19 @@ def split_pun(tokens):
   return groups
 
 class ParsedColumn:
-  __slots__ = ('success', 'name', 'type', 'default', 'unique', 'not_null')
-  def __init__(self, success, name=None, type=None, default=None, unique=None, not_null=None):
+  # todo: py 3.7 dataclass
+  __slots__ = ('success', 'name', 'type', 'default', 'unique', 'not_null', 'pkey')
+  def __init__(self, success, name=None, type=None, default=None, unique=None, not_null=None, pkey=False):
     self.success = success
     self.name = name
     self.type = type
     self.default = default
     self.unique = unique
     self.not_null = not_null
+    self.pkey = pkey
 
   def __eq__(self, other):
+    # todo: py 3.7 dataclass provides this automatically
     if not isinstance(other, self.__class__):
       return False
     return tuple(map(lambda slot: getattr(self, slot), self.__slots__)) == \
@@ -110,22 +113,51 @@ class Column:
         elif tokens[0].normalized.lower() == 'unique':
           _, *tokens = tokens
           success.unique = True
+        elif tokens[0].normalized.lower() == 'primary':
+          _, key, *tokens = tokens
+          assert key.normalized.lower() == 'key'
+          success.pkey = True
       else:
         return ParsedColumn(False)
     return success
+
+def split_pun_paren(decl):
+  """return things inside parenthesis, split by punctuation.
+  decl is a 'function expression' i.e. a piece of a create table
+  """
+  paren = next(
+    expr for expr in decl
+    if isinstance(expr, sqlparse.sql.Parenthesis)
+  )
+  return split_pun(paren)
+
 
 class CreateTable(WrappedStatement):
   def __init__(self, stmt):
     assert stmt.get_type() == 'CREATE'
     super().__init__(stmt)
 
+  def groups(self):
+    "helper for columns() and pkey_fields(). returns tokens inside the first paren, grouped by punctuation split."
+    return split_pun_paren(self.decl())
+
   def columns(self):
-    decl = self.decl()
-    paren = next(
-      expr for expr in self.decl()
-      if isinstance(expr, sqlparse.sql.Parenthesis)
-    )
-    return list(map(Column, split_pun(paren)))
+    return [
+      Column(group)
+      for group in self.groups()
+      # note: this guard blocks 'primary key (a,b)' kind of thing
+      if isinstance(group[0], sqlparse.sql.Identifier)
+    ]
+
+  def pkey_fields(self):
+    "return list of column names that are in primary key"
+    for group in self.groups():
+      if isinstance(group[0], sqlparse.sql.Token) and group[0].ttype and group[0].ttype[0] == 'Keyword':
+        idents = [ident for ident, in split_pun_paren(group)]
+        assert all(isinstance(ident, sqlparse.sql.Identifier) for ident in idents)
+        return [str(ident) for ident in idents]
+    else:
+      return [col.name for col in self.columns() if col.parse().pkey]
 
   @property
   def unique(self):
