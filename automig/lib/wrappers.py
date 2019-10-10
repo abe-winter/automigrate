@@ -119,13 +119,22 @@ class CreateTable(WrappedStatement):
     assert stmt.get_type() == 'CREATE'
     super().__init__(stmt)
 
-  def columns(self):
+  def groups(self):
+    "helper for columns() and pkey_fields(). returns tokens after first paren grouped by punctuation split."
     decl = self.decl()
     paren = next(
       expr for expr in self.decl()
       if isinstance(expr, sqlparse.sql.Parenthesis)
     )
-    return list(map(Column, split_pun(paren)))
+    return split_pun(paren)
+
+  def columns(self):
+    return [
+      Column(group)
+      for group in self.groups()
+      # note: this guard blocks 'primary key (a,b)' kind of thing
+      if isinstance(group[0], sqlparse.sql.Identifier)
+    ]
 
   @property
   def unique(self):
