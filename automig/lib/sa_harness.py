@@ -14,39 +14,21 @@ def read_glob_stmts(glob_pattern):
     stmts.extend(map(wrappers.wrap, sqlparse.parse(open(fname).read())))
   return stmts
 
-def column_args(column):
-  "parse sql column in a horrible way and "
-  state = 'name'
-  dets = {}
-  pkey = None
-  for tok in map(str, column.tokens):
-    if tok in ('collate', 'constraint', 'check', 'not', 'null'):
-      raise ValueError('unsupported token', tok)
-    if state == 'name':
-      if tok == 'primary':
-        paren = column.tokens[-1]
-        assert isinstance(paren, sqlparse.sql.Parenthesis)
-        return None, None, None, [str(ident) for ident, in wrappers.split_pun(paren)]
-      dets['name'] = tok
-      state = 'type'
-    elif state == 'type':
-      dets['type'] = tok
-      state = 'dets'
-    elif state == 'dets':
-      if tok == 'primary':
-        dets['primary_key'] = True
-        state = 'pkey'
-      elif tok == 'default':
-        state = 'default'
-      else:
-        raise ValueError('unhandled token in back section', tok)
-    elif state == 'pkey':
-      assert tok == 'key'
-      state = 'dets'
-    elif state == 'default':
-      dets['server_default'] = "sa.text('%s')" % tok
-      state = 'dets'
-  return dets.pop('name'), dets.pop('type'), dets, None
+def column_args(column, pkey_fields):
+  "parse sql column in a horrible way and return args for column constructor"
+  parsed = column.parse()
+  assert parsed.success # todo: does parse() log something on failure?
+  dets = {'name': parsed.name, 'type': parsed.type}
+  if parsed.pkey or parsed.name in pkey_fields:
+    dets['primary_key'] = True
+  if parsed.default:
+    # todo: figure out escaping here
+    dets['server_default'] = "sa.text('%s')" % parsed.default
+  if parsed.unique:
+    raise NotImplementedError('todo: sa_harness unique keys')
+  if parsed.not_null:
+    raise NotImplementedError('todo: sa_harness not null')
+  return dets.pop('name'), dets.pop('type'), dets
 
 TYPES = {
   'int': 'Integer',
@@ -72,12 +54,10 @@ def transform(table_stmts, delim=',\n  '):
     composite_pkey = None
     for stmt in stmts:
       if isinstance(stmt, wrappers.CreateTable):
+        pkey_fields = stmt.pkey_fields()
         for col in stmt.columns():
-          name, type_, dets, pkey = column_args(col)
-          if pkey:
-            composite_pkey = pkey
-          else:
-            cols[name, type_] = dets
+          name, type_, dets = column_args(col, pkey_fields)
+          cols[name, type_] = dets
       elif isinstance(stmt, wrappers.CreateIndex):
         paren = stmt.decl()[-1]
         assert isinstance(paren, sqlparse.sql.Parenthesis)
