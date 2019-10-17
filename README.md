@@ -132,8 +132,7 @@ This is how I would apply migrations in CI if I had a few weeks off to build too
 
 * Flag the migration in your code review tool before merging the change to master
   - Ideally the CR tool would run automig against master branch and show automig's output so the reviewer can sign off
-  - One way to do this: use something like the [`only: merge_requests` flag](https://docs.gitlab.com/ee/ci/merge_request_pipelines/#configuring-pipelines-for-merge-requests) in gitlab to run a `master...$CI_COMMIT_SHORT_SHA` diff (but warning, `...` doesn't have common ancestor semantics yet)
-  - In lieu of complex CR improvements, you can run automig in your CI testing tool
+  - [terraform's version of this](https://www.terraform.io/docs/github-actions/index.html) is not a bad template to borrow
 * Detect that a migration needs to be applied when deploying
   - This means that your deploy bot needs to have access to your prod DB
   - For continuous automatic deployment setups, you may want to block auto deploy for and require explicit signoff for deploys which require a migration
