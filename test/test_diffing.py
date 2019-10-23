@@ -1,4 +1,4 @@
-import pytest, sqlparse
+import pytest, sqlparse, collections
 from automig.lib import diffing, wrappers
 
 CREATE_TABLE = [
@@ -94,7 +94,7 @@ def test_all_caps_keywords():
 
 NEWLINE = [
   'create table whatever (\n  a int\n);',
-  'create table whatever (\n  a int,\n  b int\n);'
+  'create table whatever (\n  a int,\n  b int\n);',
 ]
 
 def test_newline():
@@ -103,9 +103,24 @@ def test_newline():
 
 COMMENT = [
   'create table whatever (\n  a int -- hello\n);',
-  'create table whatever (\n  a int, -- hello\n  b int\n);'
+  'create table whatever (\n  a int, -- hello\n  b int\n);',
 ]
 
 def test_comments():
   # not asserting, just checking for crash
   diffing.diff(*map(sqlparse.parse, COMMENT))
+
+PARTITION = [
+  'create table whatever (a boolean primary key);',
+  'create table whatever (a boolean primary key) partition by range (a);',
+]
+
+def test_tail():
+  "directly test CreateTable.tail()"
+  no, yes = [wrappers.wrap(parsed[0]) for parsed in map(sqlparse.parse, PARTITION)]
+  assert no.tail() == []
+  assert ['partition', 'by', 'range (a)'] == [tok.value for tok in yes.tail()]
+
+def test_partition():
+  assert diffing.diff(*map(sqlparse.parse, PARTITION))['whatever'][0].args == \
+    ("can't modify table suffix: `partition by range (a)`",)

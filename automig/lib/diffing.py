@@ -66,6 +66,9 @@ def diff_stmt(left, right):
     for k in left_cols:
       if k not in right_cols:
         changes.append(f'alter table {table} drop column {k};')
+    if left.tail() != right.tail():
+      change = ' '.join([expr.value for expr in left.tail() or right.tail()])
+      changes.append(UnsupportedChange(f"can't modify table suffix: `{change}`"))
     return changes
   else:
     raise DiffError("unhandled type", type(left))

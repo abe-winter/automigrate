@@ -164,6 +164,14 @@ class CreateTable(WrappedStatement):
     "unique key -- in this case, ('create', name) because we only allow one create stmt per table"
     return ('create', self.table)
 
+  def tail(self):
+    "non-space tokens after column parens"
+    paren_index = next((i for i, expr in enumerate(self.stmt) if isinstance(expr, sqlparse.sql.Function)), None)
+    if paren_index is None:
+      return None
+    tail = self.stmt[paren_index + 1:]
+    return [expr for expr in tail if not iswhitespace(expr) and expr.value != ';']
+
 class CreateIndex(WrappedStatement):
   def __init__(self, stmt):
     assert stmt.get_type() == 'CREATE'
