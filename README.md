@@ -79,7 +79,7 @@ insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ('9d
 * [x] Adding tables, indexes and columns should mostly work
 * [x] drop column works
 * [x] modifying columns partially works, supports changes to types, defaults, nullable. Read the `diff_column()` function for up-to-date information and file bugs for specific holes.
-* [ ] modifying primary keys doesn't work
+* [x] add, drop and change primary keys
 * [x] For diffs that are erroring, you can override with a [.manualmig.yml file](./.manualmig.yml)
 * [ ] not sure if postgres 'partition by' is supported but the differ will become very upset if you change it
 * [ ] Be careful with using unescaped keywords as names (i.e. a table named table) -- you'll likely confuse the parser even where your sql engine allows it

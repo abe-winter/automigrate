@@ -69,6 +69,13 @@ def diff_stmt(left, right):
     if left.tail() != right.tail():
       change = ' '.join([expr.value for expr in left.tail() or right.tail()])
       changes.append(UnsupportedChange(f"can't modify table suffix: `{change}`"))
+    if left.pkey_fields() != right.pkey_fields():
+      # note: order matters here too; don't compare sets
+      if left.pkey_fields():
+        changes.append(f'alter table {table} drop constraint {table}_pkey;')
+      new_pkey = ', '.join(right.pkey_fields())
+      if new_pkey:
+        changes.append(f'alter table {table} add primary key ({new_pkey});')
     return changes
   else:
     raise DiffError("unhandled type", type(left))

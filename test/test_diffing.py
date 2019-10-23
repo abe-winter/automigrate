@@ -75,9 +75,30 @@ def test_drop_column():
   delta = diffing.diff(*map(sqlparse.parse, DROP_COLUMN))
   assert delta == {'t1': ['alter table t1 drop column b;']}
 
-@pytest.mark.skip
+MODIFY_KEY_1 = [
+  'create table t1 (a int primary key);',
+  'create table t1 (a int, primary key (a));',
+]
+
+MODIFY_KEY_2 = [
+  'create table t1 (a int primary key);',
+  'create table t1 (a int, b int, primary key (a, b));',
+]
+
+MODIFY_KEY_3 = [
+  'create table t1 (a int primary key);',
+  'create table t1 (a int);',
+]
+
 def test_modify_key():
-  raise NotImplementedError
+  assert not diffing.diff(*map(sqlparse.parse, MODIFY_KEY_1))
+  assert diffing.diff(*map(sqlparse.parse, MODIFY_KEY_2))['t1'] == [
+    'alter table t1 add column b int;',
+    'alter table t1 drop constraint t1_pkey;',
+    'alter table t1 add primary key (a, b);',
+  ]
+  assert diffing.diff(*map(sqlparse.parse, MODIFY_KEY_3))['t1'] == ['alter table t1 drop constraint t1_pkey;']
+  assert diffing.diff(*map(sqlparse.parse, reversed(MODIFY_KEY_3)))['t1'] == ['alter table t1 add primary key (a);',]
 
 CREATE_INDEX = [
   'create unique index idx_col1 on t1 (col1);',
