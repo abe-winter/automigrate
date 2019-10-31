@@ -36,7 +36,15 @@ def diff_column(table, colname, left, right):
     else:
       ret.append(f"{prefix} set default {right.default};")
   if left.unique != right.unique:
-    ret.append(UnsupportedChange("can't modify uniqueness, file a bug"))
+    constraint_name = f'{table}_{colname}_key' # warning: this is postgres-specific; support with docs and check target dialect
+    if not left.unique and not right.unique:
+      raise NotImplementedError("is this case default <-> explicit 'not unique'? is there such a thing?")
+    elif left.unique and not right.unique:
+      ret.append(f"alter table {table} drop constraint {constraint_name};")
+    elif not left.unique and right.unique:
+      ret.append(UnsupportedChange("can't add unique constraint, file a bug"))
+    else:
+      raise NotImplementedError("unexpected case in uniqueness permutations")
   if left.not_null != right.not_null:
     # note: I think the possible values here are (None | True), shouldn't ever be False
     # todo: refactor this to `null` and include null / not_null as sources

@@ -145,3 +145,12 @@ def test_tail():
 def test_partition():
   assert diffing.diff(*map(sqlparse.parse, PARTITION))['whatever'][0].args == \
     ("can't modify table suffix: `partition by range (a)`",)
+
+UNIQUE = [
+  'create table whatever (a text unique);',
+  'create table whatever (a text);',
+]
+
+def test_modify_unique():
+  assert diffing.diff(*map(sqlparse.parse, UNIQUE))['whatever'] == ['alter table whatever drop constraint whatever_a_key;']
+  assert diffing.diff(*map(sqlparse.parse, reversed(UNIQUE)))['whatever'][0].args == ("can't add unique constraint, file a bug",)
