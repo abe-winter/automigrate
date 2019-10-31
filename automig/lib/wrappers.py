@@ -152,7 +152,7 @@ class CreateTable(WrappedStatement):
   def pkey_fields(self):
     "return list of column names that are in primary key"
     for group in self.groups():
-      if isinstance(group[0], sqlparse.sql.Token) and group[0].ttype and group[0].ttype[0] == 'Keyword':
+      if isinstance(group[0], sqlparse.sql.Token) and group[0].ttype and group[0].ttype[0] == 'Keyword' and group[0].value.lower() == 'primary':
         idents = [ident for ident, in split_pun_paren(group)]
         assert all(isinstance(ident, sqlparse.sql.Identifier) for ident in idents)
         return [str(ident) for ident in idents]
