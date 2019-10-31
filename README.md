@@ -85,6 +85,7 @@ insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ('9d
 * [ ] Be careful with using unescaped keywords as names (i.e. a table named table) -- you'll likely confuse the parser even where your sql engine allows it
 * [ ] This hasn't been tested on a wide range of syntax (i.e. arrays / json)
 * [ ] Not sure if capitalized SQL keywords are supported (todo add tests)
+* [ ] check that drop table / drop index works when removed from schema (and support some kind of placeholder to suppress deletion)
 * [ ] Need a way to check live schema against desired to call out problems
 * undo, i.e. what would be 'down' in a typical migration tool.
   - [ ] This may work out of the box (pass `HEAD...HEAD~1` instead of `HEAD~1...HEAD`), but needs tests
