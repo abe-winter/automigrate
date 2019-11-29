@@ -24,6 +24,19 @@ def test_add_column():
   delta = diffing.diff(*map(sqlparse.parse, ADD_COLUMN))
   assert delta == {'t1': ['alter table t1 add column b int;']}
 
+ADD_COLUMN_PKEY = [
+  'create table t1 (b int);',
+  'create table t1 (a int primary key, b int);',
+]
+
+@pytest.mark.xfail
+def test_add_column_pkey():
+  # this is doing:
+  # OrderedDict([('t1', ['alter table t1 add column a int primary key;', 'alter table t1 add primary key (a);'])])
+  # not sure if the first works; if it does, the second will probably fail
+  print(diffing.diff(*map(sqlparse.parse, ADD_COLUMN_PKEY)))
+  raise NotImplementedError
+
 MODIFY_COLUMN = [
   'create table t1 (a jsonb primary key, b int default 10, c text[], d varchar(12));',
   # this is modifying a default, setting not nullable, and changing a varchar size
@@ -74,6 +87,17 @@ DROP_COLUMN = [
 def test_drop_column():
   delta = diffing.diff(*map(sqlparse.parse, DROP_COLUMN))
   assert delta == {'t1': ['alter table t1 drop column b;']}
+
+DROP_COLUMN__PKEY = [
+  'create table t1 (a int primary key, b int);',
+  'create table t1 (b int);',
+]
+
+@pytest.mark.xfail
+def test_drop_column_pkey():
+  # order is wrong here I think
+  print(diffing.diff(*map(sqlparse.parse, DROP_COLUMN__PKEY)))
+  raise NotImplementedError
 
 MODIFY_KEY_1 = [
   'create table t1 (a int primary key);',
