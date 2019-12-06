@@ -52,6 +52,7 @@ def diff_column(table, colname, left, right):
     ret.append(f"{prefix} {'set' if right.not_null else 'drop'} not null;")
   return ret
 
+# todo: refactor, this is too complicated
 def diff_stmt(left, right):
   "diff two WrappedStmt with same unique key. return list of statements to run."
   assert left.unique == right.unique
@@ -59,9 +60,10 @@ def diff_stmt(left, right):
   if isinstance(left, wrappers.CreateTable):
     left_cols = {col.name: col for col in left.columns()}
     right_cols = {col.name: col for col in right.columns()}
+    added_cols = [k for k in right_cols if k not in left_cols]
     changes = [
       f'alter table {table} add column {right_cols[k].render()};'
-      for k in right_cols if k not in left_cols
+      for k in added_cols
     ]
     changed = {
       k: (left_cols[k], right_cols[k])
@@ -80,10 +82,15 @@ def diff_stmt(left, right):
     if left.pkey_fields() != right.pkey_fields():
       # note: order matters here too; don't compare sets
       if left.pkey_fields():
-        changes.append(f'alter table {table} drop constraint {table}_pkey;')
+        # this gets inserted at the beginning because need to drop constraint before dropping column
+        changes.insert(0, f'alter table {table} drop constraint {table}_pkey;')
       new_pkey = ', '.join(right.pkey_fields())
       if new_pkey:
-        changes.append(f'alter table {table} add primary key ({new_pkey});')
+        # note: ParsedColumn.pkey means that this is inline pkey stmt, no need to add constraint
+        if set(added_cols) >= set(right.pkey_fields()) and any(right_cols[k].parse().pkey for k in added_cols):
+          pass # adding a pkey column will add the constraint
+        else:
+          changes.append(f'alter table {table} add primary key ({new_pkey});')
     return changes
   else:
     raise DiffError("unhandled type", type(left))
