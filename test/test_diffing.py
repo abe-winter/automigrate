@@ -29,13 +29,10 @@ ADD_COLUMN_PKEY = [
   'create table t1 (a int primary key, b int);',
 ]
 
-@pytest.mark.xfail
 def test_add_column_pkey():
-  # this is doing:
-  # OrderedDict([('t1', ['alter table t1 add column a int primary key;', 'alter table t1 add primary key (a);'])])
-  # not sure if the first works; if it does, the second will probably fail
-  print(diffing.diff(*map(sqlparse.parse, ADD_COLUMN_PKEY)))
-  raise NotImplementedError
+  "this is testing that this doesn't also do an 'alter table add primary key'"
+  assert diffing.diff(*map(sqlparse.parse, ADD_COLUMN_PKEY))['t1'] == \
+    ['alter table t1 add column a int primary key;']
 
 MODIFY_COLUMN = [
   'create table t1 (a jsonb primary key, b int default 10, c text[], d varchar(12));',
@@ -93,11 +90,10 @@ DROP_COLUMN__PKEY = [
   'create table t1 (b int);',
 ]
 
-@pytest.mark.xfail
 def test_drop_column_pkey():
-  # order is wrong here I think
-  print(diffing.diff(*map(sqlparse.parse, DROP_COLUMN__PKEY)))
-  raise NotImplementedError
+  "this is testing that the 'drop constraint' comes before the 'drop column'"
+  assert diffing.diff(*map(sqlparse.parse, DROP_COLUMN__PKEY))['t1'] == \
+    ['alter table t1 drop constraint t1_pkey;', 'alter table t1 drop column a;']
 
 MODIFY_KEY_1 = [
   'create table t1 (a int primary key);',
@@ -117,8 +113,8 @@ MODIFY_KEY_3 = [
 def test_modify_key():
   assert not diffing.diff(*map(sqlparse.parse, MODIFY_KEY_1))
   assert diffing.diff(*map(sqlparse.parse, MODIFY_KEY_2))['t1'] == [
-    'alter table t1 add column b int;',
     'alter table t1 drop constraint t1_pkey;',
+    'alter table t1 add column b int;',
     'alter table t1 add primary key (a, b);',
   ]
   assert diffing.diff(*map(sqlparse.parse, MODIFY_KEY_3))['t1'] == ['alter table t1 drop constraint t1_pkey;']
