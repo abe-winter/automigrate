@@ -9,7 +9,7 @@ Use this if you don't like to manage migrations separately from your declarative
 * [Installation & basic use](#installation--basic-use)
 * [What's happening under the covers](#whats-happening-under-the-covers)
 * [What does & doesn't work](#what-does--doesnt-work)
-* [Comparison vs other tools](#comparison-vs-other-tools)
+* [Comparison of migration tools](#comparison-of-migration-tools)
 * [Using with ORMs](#using-with-orms)
 * [Integrating with CI](#integrating-with-ci)
 
