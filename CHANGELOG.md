@@ -2,6 +2,10 @@
 
 ## 0.0.x
 
+* 0.0.15
+  - bugfix: fix order of drop/add constraint in some modify key cases
+  - feature: support dropping unique constraint on a column
+  - bugfix: fix case where primary key parser gets tricked by other keywords at the end of the create table statement
 * 0.0.14 feature: add, drop and change primary key
 * 0.0.13 bugfix: throw an error when 'partition by' changes rather than incorrect empty diff
 * 0.0.12 bugfix: support separate `primary key ()` tuple in `create table`
