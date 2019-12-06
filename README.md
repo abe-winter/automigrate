@@ -106,15 +106,28 @@ insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ('9d
 * [ ] [0.2.0] support 'create extension'
 * [ ] [0.2.0] support enums
 
-## Comparison vs other tools
+## Comparison of migration tools
+
+I did some market research before/during writing this tool. Seems like the landscape is:
+
+### Schema differs
 
 * [prisma lift](https://github.com/prisma/lift) has a declarative schema which *isn't* sql but looks kind of like it, and depends on a runtime DB to generate the migration diff, but seems like a neat tool
-* [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html), as far as I can tell, requires you to generate a skeleton python file for each change then fill it in yourself
-* [sqlite sqldiff.exe](https://www.sqlite.org/sqldiff.html) can diff schemas but operates on full sqlite databases and I'm not sure if it outputs DDL
 * liquibase might have a [diffing system](https://www.liquibase.org/documentation/diff.html) but from the docs it looks like it's outputting XML. And [they advise you not to use it](http://www.liquibase.org/2007/06/the-problem-with-database-diffs.html)
 * [redgate sql compare](https://documentation.red-gate.com/sc/sql-server-management-studio-add-in/getting-started-with-the-add-in) seems to support comparing 'create table' schemas across git versions, although it looks like you have to find the SHAs by hand in a GUI
-* [migra](https://github.com/djrobstep/migra) seems to require two live DBs to run a diff (one with current schema, one with new)
+
+### Pure migration managers
+
+(i.e. write the DDL yourself, no automation)
+
+* [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html), as far as I can tell, requires you to generate a skeleton python file for each change then fill it in yourself
 * [sqitch](https://sqitch.org) seems to require manually specifying `deploy` sql (and optionally `revert` & `verify`)
+
+### Tools that diff live DBs
+
+* [sqlite sqldiff.exe](https://www.sqlite.org/sqldiff.html) can diff schemas but operates on full sqlite databases and I'm not sure if it outputs DDL
+* [migra](https://github.com/djrobstep/migra) seems to require two live DBs to run a diff (one with current schema, one with new)
+* [pgquarrel](https://github.com/eulerto/pgquarrel) haven't tried it, seems to use 2 running DBs to generate migration
 
 ## Using with ORMs
 
