@@ -5,7 +5,7 @@
 # automig 218dd2c...b5b40ce 'test/schema/*.sql'
 # automig 218dd2c...HEAD 'test/schema/*.sql'
 
-import argparse, git, os, yaml
+import argparse, git, os, pathlib, yaml
 from datetime import datetime
 from .lib import ref_diff, githelp
 
@@ -63,7 +63,7 @@ def main():
     shas.append(commit.hexsha)
     tree = commit.tree
     assert len(rev_tuple) == 1, "can't pass a sha range for --initial"
-    for contents in githelp.get_streams(tree, args.glob):
+    for contents in githelp.get_streams(tree, pathlib.Path.cwd() / pathlib.Path(args.glob)):
       print(contents.decode())
   else:
     assert len(rev_tuple) == 2, "must pass a sha range or set --initial"
