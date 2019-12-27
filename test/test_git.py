@@ -2,10 +2,10 @@ import git, glob, pytest, sqlparse, os
 from automig.lib import githelp, ref_diff, diffing
 
 SHAS = {
-  'create-t1': '218dd2c',
-  'add-t1-col': '9dcbd4e81e9a0dd7629ed7ae82a86891a88f76f3',
-  'add-t2-t1a': 'b5b40ce718ea7241fee8d0a3826f244d21bf413c',
-  'unsup-alter-col': '0756d87',
+  'create-t1': '2801578',
+  'add-t1-col': '2ff9297cb26c9491c159af728ad6734ad06f8542',
+  'add-t2-t1a': 'f8b1048fd12b6ef41568801867b67d3ca74904f3',
+  'unsup-alter-col': 'c479bb0',
 }
 GLOB ='test/schema/*.sql'
 

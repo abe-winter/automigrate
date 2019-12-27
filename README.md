@@ -47,12 +47,12 @@ Typical invocations:
 
 ```bash
 # create an initial migration (also create meta tables)
-automig 218dd2c 'test/schema/*.sql' --initial | psql -h 172.17.0.2 -U postgres --single-transaction
+automig 2801578 'test/schema/*.sql' --initial | psql -h 172.17.0.2 -U postgres --single-transaction
 
 # migrate a database
 LAST_SHA=$(psql -h 172.17.0.2 -U postgres -t -c "select sha from automigrate_meta order by id desc limit 1")
 echo migrating from $LAST_SHA
-automig $LAST_SHA...b5b40ce 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --single-transaction
+automig $LAST_SHA...f8b1048 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --single-transaction
 
 # I guess you can just migrate to HEAD if you're feeling lucky
 automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --single-transaction
@@ -60,18 +60,18 @@ automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --
 
 ## What's happening under the covers
 
-Nothing fancy. When you run `automig 218dd2c...b5b40ce 'test/schema/*.sql'` (these are real SHAs in this git repo and will work if you clone the repo), it outputs:
+Nothing fancy. When you run `automig 2801578...f8b1048 'test/schema/*.sql'` (these are real SHAs in this git repo and will work if you clone the repo), it outputs:
 
 ```sql
--- changeset created from Namespace(glob='test/schema/*.sql', initial=False, opaque=False, ref='218dd2c...b5b40ce', update_meta=False) at 2019-09-26 01:57:58.404722
--- changes for 9dcbd4e.t1
+-- changeset created from Namespace(glob='test/schema/*.sql', initial=False, opaque=False, ref='2801578...f8b1048', update_meta=False) at 2019-12-27 15:07:51.545551
+-- changes for 2ff9297.t1
 alter table t1 add column b int;
--- changes for b5b40ce.t1
+-- changes for f8b1048.t1
 create index t1a on t1 (a);
--- changes for b5b40ce.t2
+-- changes for f8b1048.t2
 create table t2 (a int primary key);
-insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ('218dd2c', '9dcbd4e81e9a0dd7629ed7ae82a86891a88f76f3', '0.0.10', false);
-insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ('9dcbd4e81e9a0dd7629ed7ae82a86891a88f76f3', 'b5b40ce718ea7241fee8d0a3826f244d21bf413c', '0.0.10', false);
+insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ('2801578', '2ff9297cb26c9491c159af728ad6734ad06f8542', '0.0.16', false);
+insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ('2ff9297cb26c9491c159af728ad6734ad06f8542', 'f8b1048fd12b6ef41568801867b67d3ca74904f3', '0.0.16', false);
 ```
 
 ## What does & doesn't work

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 "entrypoint for automigrate command line"
 # example:
-# automig 218dd2c 'test/schema/*.sql' --initial
-# automig 218dd2c...b5b40ce 'test/schema/*.sql'
-# automig 218dd2c...HEAD 'test/schema/*.sql'
+# automig 2801578 'test/schema/*.sql' --initial
+# automig 2801578...f8b1048 'test/schema/*.sql'
+# automig 2801578...HEAD 'test/schema/*.sql'
 
 import argparse, git, os, pathlib, yaml
 from datetime import datetime
