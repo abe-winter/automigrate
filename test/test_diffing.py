@@ -129,6 +129,14 @@ def test_add_index():
   delta = diffing.diff(*map(sqlparse.parse, CREATE_INDEX))
   assert delta == {'t1': ['create unique index idx_col2 on t1 (col2);']}
 
+EDIT_INDEX = [
+  'create index idx_col1 on t1 (col1);',
+  'create index idx_col1 on t1 (col1, col2);',
+]
+
+def test_edit_index():
+  assert diffing.diff(*map(sqlparse.parse, EDIT_INDEX))['t1'] == ['drop index idx_col1;', 'create index idx_col1 on t1 (col1, col2);']
+
 @pytest.mark.skip
 def test_all_caps_keywords():
   raise NotImplementedError

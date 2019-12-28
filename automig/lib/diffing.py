@@ -92,6 +92,11 @@ def diff_stmt(left, right):
         else:
           changes.append(f'alter table {table} add primary key ({new_pkey});')
     return changes
+  elif isinstance(left, wrappers.CreateIndex):
+    return [
+      f'drop index {left.index_name};',
+      str(right.stmt)
+    ]
   else:
     raise DiffError("unhandled type", type(left))
 
