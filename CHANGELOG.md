@@ -2,6 +2,7 @@
 
 ## 0.0.x
 
+* (unreleased) bugfix: accept keywords as identifiers sometimes
 * 0.0.17 feature: changing named index drops & re-adds it
 * 0.0.16 1ab5ec9 bugfix: --initial mode wasn't reading the glob (abs paths for globs broke this)
 * 0.0.15 12a79e8

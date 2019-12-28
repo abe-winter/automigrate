@@ -154,7 +154,9 @@ class CreateTable(WrappedStatement):
     for group in self.groups():
       if isinstance(group[0], sqlparse.sql.Token) and group[0].ttype and group[0].ttype[0] == 'Keyword' and group[0].value.lower() == 'primary':
         idents = [ident for ident, in split_pun_paren(group)]
-        assert all(isinstance(ident, sqlparse.sql.Identifier) for ident in idents)
+        # note: in theory we just want identifiers, but there are a lot of tokens and people use them by accident to name columns; most SQL engines accept it
+        # (and this parser can't handle ticks I don't think)
+        assert all(isinstance(ident, (sqlparse.sql.Identifier, sqlparse.sql.Token)) for ident in idents)
         return [str(ident) for ident in idents]
     else:
       return [col.name for col in self.columns() if col.parse().pkey]
