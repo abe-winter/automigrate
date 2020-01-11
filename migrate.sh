@@ -21,14 +21,15 @@ range() {
 # previews the automigrate command without changing the DB
 preview_automig() {
 	range
-	automig $RANGE $AUTOMIG_GLOB
+	# note: eval here is because AUTOMIG_GLOB has single-quotes and needs to be unquoted here
+	eval "automig $RANGE $AUTOMIG_GLOB"
 }
 
 # applies a migration
 update_automig() {
 	range
-	automig $RANGE $AUTOMIG_GLOB
-	automig $RANGE $AUTOMIG_GLOB | psql -h $AUTOMIG_HOST -U postgres --single-transaction
+	eval "automig $RANGE $AUTOMIG_GLOB"
+	eval "automig $RANGE $AUTOMIG_GLOB" | psql -h $AUTOMIG_HOST -U postgres --single-transaction
 }
 
 usage() {
