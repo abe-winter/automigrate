@@ -2,6 +2,8 @@
 
 import sqlparse
 
+class MiscBadParse(Exception): pass
+
 class WrappedStatement:
   "base class"
   __slots__ = ('stmt',)
@@ -16,7 +18,10 @@ class WrappedStatement:
 
   def decl(self):
     "helper to get the function element, i.e. the table declaration"
-    return next(expr for expr in self.stmt if isinstance(expr, sqlparse.sql.Function))
+    ret = next((expr for expr in self.stmt if isinstance(expr, sqlparse.sql.Function)), None)
+    if ret is None:
+      raise MiscBadParse("Can't parse table declaration. Did you name a table with a sql keyword?", list(self.stmt))
+    return ret
 
   @property
   def table(self):
