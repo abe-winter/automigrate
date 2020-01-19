@@ -103,10 +103,13 @@ insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ('2f
 
 ## Burndown
 
+* [ ] [0.2.0] enums
 * [ ] [0.2.0] integration test with mysql and postgres
 * [ ] [0.2.0] take more than one glob
-* [ ] [0.2.0] support 'create extension'
-* [ ] [0.2.0] support enums
+* [ ] [0.2.0] test 'create extension' and support if not working
+* [ ] [0.2.0] `.manualmig.yml` skip section for skipping bad migrations that need to be opaque
+* [ ] [0.2.0] ensure capitalized keywords support in test suite
+* [ ] [0.2.0] command to list dangerous operations in a diff (anything that drops data or schemas, any big / slow locking operations), so users can require CI signoff
 
 ## Comparison of migration tools
 

@@ -25,11 +25,11 @@ def build_parser():
 # this creates the meta tables
 PREAMBLE = """
 -- meta_meta stores the meta version
-create table automigrate_meta_meta (id serial primary key, meta_version int, applied timestamp default now());
+create table if not exists automigrate_meta_meta (id serial primary key, meta_version int, applied timestamp default now());
 insert into automigrate_meta_meta (meta_version) values (3);
 
 -- meta stores the schema version
-create table automigrate_meta (id serial primary key, sha text, applied timestamp default now(), fromsha text, opaque bool, automig_version text);
+create table if not exists automigrate_meta (id serial primary key, sha text, applied timestamp default now(), fromsha text, opaque bool, automig_version text);
 """
 
 POSTGRES_PREAMBLE = """
