@@ -1,27 +1,28 @@
 #!/usr/bin/env bash
-# migrate.sh -- run migrations against a postgres db
+# migrate.sh -- run migration against a postgres DB
 
 set -euo pipefail
 
 HEAD=$(git rev-parse HEAD)
+TARGET=${TARGET:-$HEAD}
 
 # runs automig with --init to setup the migration tables
 # call this to set up automig on a fresh DB
 init_automig() {
-	automig $HEAD $AUTOMIG_GLOB --initial | psql -h $AUTOMIG_HOST -U postgres --single-transaction
+	# note: eval here is because AUTOMIG_GLOB has single-quotes and needs to be unquoted here
+	eval "automig $TARGET $AUTOMIG_GLOB --initial" | psql $AUTOMIG_CON --single-transaction
 }
 
-# helper for preview / update. sets AUTOMIG_HOST, RANGE
+# helper for preview / update. sets LAST_SHA, RANGE
 range() {
-	local LAST_SHA=$(psql -h $AUTOMIG_HOST -U postgres -t -c "select sha from automigrate_meta order by id desc limit 1")
-	RANGE=$LAST_SHA...$HEAD
+	local LAST_SHA=$(psql $AUTOMIG_CON -t -c "select sha from automigrate_meta order by id desc limit 1")
+	RANGE=$LAST_SHA...$TARGET
 	echo "RANGE is $RANGE"
 }
 
 # previews the automigrate command without changing the DB
 preview_automig() {
 	range
-	# note: eval here is because AUTOMIG_GLOB has single-quotes and needs to be unquoted here
 	eval "automig $RANGE $AUTOMIG_GLOB"
 }
 
@@ -29,7 +30,7 @@ preview_automig() {
 update_automig() {
 	range
 	eval "automig $RANGE $AUTOMIG_GLOB"
-	eval "automig $RANGE $AUTOMIG_GLOB" | psql -h $AUTOMIG_HOST -U postgres --single-transaction
+	eval "automig $RANGE $AUTOMIG_GLOB" | psql $AUTOMIG_CON --single-transaction
 }
 
 usage() {
