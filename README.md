@@ -149,7 +149,7 @@ Happy to accept PRs to generate ORM defs from `create table` stmts (or vice vers
 
 ## Kube integration
 
-At cloudprogress, we use this system to apply migrations on out kubernetes cluster. There are instructions for setting this up in the `./kube` folder of this repo.
+At cloudprogress, we use this system to apply migrations on out kubernetes cluster. This repo has [instructions for doing migrations on kubernetes](./kube) in the `kube` folder.
 
 ## Integrating with CI
 

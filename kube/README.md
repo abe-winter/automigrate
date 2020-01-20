@@ -1,6 +1,8 @@
 # Kube integration
 
-The files
+Want to run migrations as kubernetes jobs using automig so that you don't have to manually define `up` and `down` steps? You're in the right place.
+
+The stuff in this folder should guide you through attaching automig to your git repo & kube cluster.
 
 ## This is a beta
 
@@ -9,12 +11,6 @@ This kube-based migration in production use at cloudprogress, but that doesn't m
 1. Warts are to be expected, raise issues if these docs are incomplete / unclear / wrong
 1. That being said, such support is not guaranteed
 1. Loss of data or undesired extra data are among the many possible bad outcomes of using this
-
-## Rough description
-
-Want to run migrations as kubernetes jobs using automig so that you don't have to manually define `up` and `down` steps? You're in the right place.
-
-The stuff in this folder should guide you through attaching automig to your git repo & kube cluster.
 
 ## Details
 
