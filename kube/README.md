@@ -14,12 +14,12 @@ This kube-based migration in production use at cloudprogress, but that doesn't m
 
 ## Details
 
-Prerequisites:
+### Prerequisites
 
 1. Be familiar with kustomize (the kube-native helm replacement)
 1. Be using postgres -- the toolchain will need some tweaks to work with mysql
 
-Initial setup:
+### Initial setup
 
 1. Set up your repo to build a docker image for migration
 	- add automig.Dockerfile to your project repo (it's named that way to avoid colliding with your existing `Dockerfile`)
@@ -38,7 +38,7 @@ Initial setup:
 	- If you don't have a wildcard in your glob, the quoting shouldn't matter
 1. Run kustomize to apply this to your cluster, fix / report any errors
 
-Running your initial migration:
+### Running your initial migration
 
 (Todo: add instructions for attaching automig to an existing database).
 
@@ -49,7 +49,7 @@ Running your initial migration:
 1. Use `kubectl get job` and `kubectl logs job/whatever -f` to wait for success
 1. **Important**: once this works, change `--init` back to `--update` and rerun kustomize
 
-Running subsequent migrations:
+### Running subsequent migrations
 
 1. In kustomize.yml, change `newTag` to your desired sha
 1. In migrate.yml, change the value of `TARGET` to your desired sha (if you leave it out, it may be able to infer `HEAD`, but I'm not sure)
