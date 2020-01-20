@@ -1,0 +1,7 @@
+build_migrate:
+  variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/migrate:$CI_COMMIT_SHORT_SHA
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -f automig.Dockerfile -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG

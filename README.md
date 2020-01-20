@@ -11,6 +11,7 @@ Use this if you don't like to manage migrations separately from your declarative
 * [What does & doesn't work](#what-does--doesnt-work)
 * [Comparison of migration tools](#comparison-of-migration-tools)
 * [Using with ORMs](#using-with-orms)
+* [Kube integration](#kube-integration)
 * [Integrating with CI](#integrating-with-ci)
 
 ## Beta software
@@ -145,6 +146,10 @@ python -m automig.lib.sa_harness 'test/schema/*.sql'
 ```
 
 Happy to accept PRs to generate ORM defs from `create table` stmts (or vice versa).
+
+## Kube integration
+
+At cloudprogress, we use this system to apply migrations on out kubernetes cluster. There are instructions for setting this up in the `./kube` folder of this repo.
 
 ## Integrating with CI
 

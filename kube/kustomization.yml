@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+images:
+- name: registry/project/repo/migrate
+  # note: you'll need to build your own image here that has your schema built in. See sample Dockerfile
+  # todo: publish a base image for this
+  newTag: abcd0123
+resources:
+- migrate.yml

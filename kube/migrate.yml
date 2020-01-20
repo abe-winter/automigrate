@@ -1,0 +1,31 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: migrate
+spec:
+  schedule: "0 0 1 * 0"
+  suspend: true # this is only used as a --from= for jobs, hence doesn't run auto
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: migrate
+            image: registry/project/repo/migrate
+            # note: set this to --init for your initial migration
+            command: [./migrate.sh, --update]
+            env:
+            - name: TARGET
+              value: beef0000
+            - name: AUTOMIG_GLOB
+              value: "'schema/*.sql'"
+            - name: AUTOMIG_CON
+              valueFrom:
+                secretKeyRef:
+                  name: database-credentials
+                  key: libpq-url
+            - name: PGCONNECT_TIMEOUT
+              value: "10"
+          imagePullSecrets:
+          - name: regcred
