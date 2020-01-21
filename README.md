@@ -12,7 +12,6 @@ Use this if you don't like to manage migrations separately from your declarative
 * [Comparison of migration tools](#comparison-of-migration-tools)
 * [Using with ORMs](#using-with-orms)
 * [Kube integration](#kube-integration)
-* [Integrating with CI](#integrating-with-ci)
 
 ## Beta software
 
@@ -40,7 +39,7 @@ This is beta software and you should be careful with its output.
 
 ## Installation & basic use
 
-(note: you can do most of this stuff with `migrate.sh`, docs coming)
+(note: you can do most of this stuff with `kube/migrate.sh`, docs coming)
 
 To install, `pip install automig` (or use `pip3` if that fails). This should install dependencies and register the automig command.
 
@@ -149,25 +148,7 @@ Happy to accept PRs to generate ORM defs from `create table` stmts (or vice vers
 
 ## Kube integration
 
-At cloudprogress, we use this system to apply migrations on out kubernetes cluster. This repo has [instructions for doing migrations on kubernetes](./kube) in the `kube` folder.
-
-## Integrating with CI
-
-This is how I would apply migrations in CI if I had a few weeks off to build tooling. If you try this & it works, let me know.
-
-* Flag the migration in your code review tool before merging the change to master
-  - Ideally the CR tool would run automig against master branch and show automig's output so the reviewer can sign off
-  - [terraform's version of this](https://www.terraform.io/docs/github-actions/index.html) is not a bad template to borrow
-* Detect that a migration needs to be applied when deploying
-  - This means that your deploy bot needs to have access to your prod DB
-  - For continuous automatic deployment setups, you may want to block auto deploy for and require explicit signoff for deploys which require a migration
-  - Alert / page in the appropriate place when a deploy is held because it has a migration
-* Apply the migration from deploy CI
-  - To be safe, this requires an exactly-once semantic
-  - Unlock the automatic deployment when the migration has successfully applied
-  - Alert / page on error applying
-  - Some migrations may require downtime for part or all of your cluster -- these migrations probably won't be automatic
-  - Note that the order of new code & migration depends on the contents of the migration. [This staffjoy post](https://blog.staffjoy.com/dont-migrate-databases-automatically-5039ab061365?gi=3451f6178158#5822) points out that with ORMs that select all columns by name (vs with `*`), `add column` & `drop column` can both be done with 0 downtime, but drop column migrations must be applied **after** the new code is out
+At [cloudprogress](https://github.com/cloudprogress), we use this system to apply migrations on out kubernetes cluster. This repo has [instructions for doing migrations on kubernetes](./kube) in the `kube` folder.
 
 ## Development workflow
 
