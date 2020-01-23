@@ -110,6 +110,7 @@ insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ('2f
 * [ ] [0.2.0] `.manualmig.yml` skip section for skipping bad migrations that need to be opaque
 * [ ] [0.2.0] ensure capitalized keywords support in test suite
 * [ ] [0.2.0] command to list dangerous operations in a diff (anything that drops data or schemas, any big / slow locking operations), so users can require CI signoff
+* [ ] [0.2.0] design & test master-branch-only mode (because committing cross-branch migrations can cause trouble with squash commits)
 
 ## Comparison of migration tools
 
