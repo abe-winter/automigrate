@@ -4,7 +4,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    # - uses: actions/checkout@v2
+    - name: checkout
+      run: |
+        git clone https://github.com/abe-winter/automigrate.git
+        cd automigrate
+        git checkout $GITHUB_SHA
     - uses: actions/setup-python@v1
       with:
         python-version: '>=3.6'
