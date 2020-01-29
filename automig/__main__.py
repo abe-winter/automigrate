@@ -86,7 +86,7 @@ def main_inner(args):
   for sha1, sha2 in zip(shas[:-1], shas[1:]):
     # todo: hard w/out depending on a sql driver but do some kind of escaping here
     sha1 = f"'{sha1}'" if sha1 is not None else 'NULL'
-    lines.append(f"insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ({sha1}, '{sha2}', '{read_version()}', {['false', 'true'][args.opaque]});")
+    lines.append(f"insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ({sha1}, '{sha2}', '{__version__}', {['false', 'true'][args.opaque]});")
   return '\n'.join(lines)
 
 def main():
