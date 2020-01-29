@@ -1,6 +1,7 @@
 "ref_diff.py -- run sql diffs on git repos"
 
-import sqlparse, collections, os, pathlib
+import collections, os, pathlib
+import sqlparse
 from . import githelp, diffing
 
 def files_to_smts(fulltexts):
@@ -28,6 +29,7 @@ def ref_range_diff(repo, ref1, ref2, pattern, opaque=False):
   assert os.path.isabs(repo.working_dir), "working dir is non-abs -- file a bug"
   # note: pathlib '/' operator should filter out single-dot
   absglob = pathlib.Path.cwd() / pathlib.Path(pattern)
+  # pylint: disable=consider-using-in
   assert not any(part == '.' or part == '..' for part in pathlib.Path(absglob).parts), "parent paths not supported -- file a bug"
   commits = list(repo.iter_commits(
     f'{ref1}...{ref2}',
@@ -49,9 +51,9 @@ def extract_errors(sha_table_stmts):
     sha: diffing.get_errors(table_stmts)
     for sha, table_stmts in sha_table_stmts.items()
   }
-  for k, v in list(ret.items()):
-    if not v:
-      del ret[k]
+  for key, val in list(ret.items()):
+    if not val:
+      del ret[key]
   return ret
 
 def try_repair_errors(errors, manual_overrides, sha_table_stmts):

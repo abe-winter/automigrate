@@ -20,9 +20,9 @@ def update(args):
   with psycopg2.connect(args.automig_con) as con, con.cursor() as cur:
     cur.execute('select sha from automigrate_meta order by id desc limit 1')
     last_sha, = cur.fetchone()
-    range = f"{last_sha}...{args.target}"
-    print("range is", range)
-    pass_down_args = [range, args.glob]
+    range_ = f"{last_sha}...{args.target}"
+    print("range is", range_)
+    pass_down_args = [range_, args.glob]
     if args.opaque:
       pass_down_args.append('--opaque')
     sql = main_inner(build_parser().parse_args(pass_down_args))

@@ -1,0 +1,8 @@
+[MESSAGES CONTROL]
+
+disable=line-too-long, multiple-imports, fixme, missing-function-docstring, multiple-statements, too-many-locals, trailing-comma-tuple, no-else-return, missing-class-docstring, no-else-raise
+
+[FORMAT]
+
+indent-string = "  "
+indent-after-paren=2

@@ -1,6 +1,6 @@
 "diffing.py -- sql-diffing"
 
-import collections, sqlparse, yaml
+import collections
 from . import wrappers
 
 class DiffError(Exception): pass
@@ -53,6 +53,7 @@ def diff_column(table, colname, left, right):
   return ret
 
 # todo: refactor, this is too complicated
+# pylint: disable=too-many-branches
 def diff_stmt(left, right):
   "diff two WrappedStmt with same unique key. return list of statements to run."
   assert left.unique == right.unique
@@ -125,7 +126,7 @@ def diff(left, right):
   output = collections.OrderedDict()
   for key, stmts in groups_r.items():
     if key in groups_l:
-      changes = [stmt for stmt in diff_stmts(groups_l[key], stmts)]
+      changes = diff_stmts(groups_l[key], stmts)
       if changes:
         output[key] = changes
     else:

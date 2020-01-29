@@ -5,8 +5,9 @@
 # automig 2801578...f8b1048 'test/schema/*.sql'
 # automig 2801578...HEAD 'test/schema/*.sql'
 
-import argparse, git, os, pathlib, yaml
+import argparse, os, pathlib
 from datetime import datetime
+import git, yaml
 from .lib import ref_diff, githelp
 
 def read_version():

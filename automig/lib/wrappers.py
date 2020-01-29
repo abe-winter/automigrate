@@ -61,6 +61,8 @@ def split_pun(tokens):
 class ParsedColumn:
   # todo: py 3.7 dataclass
   __slots__ = ('success', 'name', 'type', 'default', 'unique', 'not_null', 'pkey')
+  # todo: rename type (but it's a risky refactor with inadequate test coverage on sa_harness)
+  # pylint: disable=redefined-builtin, too-many-arguments
   def __init__(self, success, name=None, type=None, default=None, unique=None, not_null=None, pkey=False):
     self.success = success
     self.name = name
@@ -163,8 +165,7 @@ class CreateTable(WrappedStatement):
         # (and this parser can't handle ticks I don't think)
         assert all(isinstance(ident, (sqlparse.sql.Identifier, sqlparse.sql.Token)) for ident in idents)
         return [str(ident) for ident in idents]
-    else:
-      return [col.name for col in self.columns() if col.parse().pkey]
+    return [col.name for col in self.columns() if col.parse().pkey]
 
   @property
   def unique(self):
@@ -197,6 +198,7 @@ class CreateIndex(WrappedStatement):
     "unique key -- in this case, ('create', name) because we only allow one create stmt per table"
     return ('index', self.index_name)
 
+# pylint: disable=inconsistent-return-statements
 def wrap(stmt):
   assert isinstance(stmt, sqlparse.sql.Statement)
   if stmt.get_type() == 'CREATE':

@@ -4,6 +4,7 @@
 
 * next
   - feature: `automig_pg` mimics migrate.sh with simpler install step
+  - maintenance: .pylintrc and lint passing
 * 0.0.18
   - bugfix: accept keywords as identifiers sometimes
   - bugfix: clearer error when the parser thinks a table name is a keyword

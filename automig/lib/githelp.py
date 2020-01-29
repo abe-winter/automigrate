@@ -1,6 +1,7 @@
 "githelp.py -- helpers for doing things on git"
 
-import git, fnmatch, os, collections
+import fnmatch
+import git
 
 def parse_rev_to_tuple(rev_string):
   if '...' in rev_string:
