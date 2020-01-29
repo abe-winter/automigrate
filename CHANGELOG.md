@@ -2,7 +2,7 @@
 
 ## 0.0.x
 
-* next
+* 0.0.19
   - feature: `automig_pg` mimics migrate.sh with simpler install step
   - feature: postgres optional dependency
   - maintenance: .pylintrc and lint passing
