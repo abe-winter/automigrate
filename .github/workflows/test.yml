@@ -5,10 +5,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '>=3.6'
     - name: deps
       run: |
-        pip3 install -r requirements.txt
-        pip3 install pytest pylint==2.4.4
+        pip install -r requirements.txt
+        pip install pytest pylint
     - name: test
       run: pytest
     - name: lint
