@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 "migrate_pg.py -- . requires psycopg2, i.e. you should install with 'postgres' optional requirement"
 
-import argparse, os, psycopg2
+import argparse, os
+import psycopg2 # pylint: disable=import-error
 from .__main__ import build_parser, main_inner
 
 def init(args):
