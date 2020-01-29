@@ -3,10 +3,11 @@
 import os
 from distutils.core import setup
 from setuptools import find_packages
+from automig.version import __version__
 
 setup(
   name='automig',
-  version=open(os.path.join(os.path.dirname(__file__), 'automig', 'VERSION')).read().strip(),
+  version=__version__,
   description="Declarative, automatic db migrations using SQL & git as the source of truth",
   author="Abe Winter",
   url="https://github.com/abe-winter/automigrate",
@@ -27,5 +28,4 @@ setup(
   python_requires='>=3.6', # for format strings
   long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
   long_description_content_type='text/markdown',
-  include_package_data=True,
 )

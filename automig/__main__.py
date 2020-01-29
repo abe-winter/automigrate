@@ -9,13 +9,10 @@ import argparse, os, pathlib
 from datetime import datetime
 import git, yaml
 from .lib import ref_diff, githelp
-
-def read_version():
-  return open(os.path.join(os.path.dirname(__file__), 'VERSION')).read().strip()
+from .version import __version__
 
 def build_parser():
-  version = read_version()
-  parser = argparse.ArgumentParser(description=__doc__ + f" v{version}")
+  parser = argparse.ArgumentParser(description=__doc__ + f" v{__version__}")
   parser.add_argument('ref', help="single git ref (i.e. sha) or sha1...sha2")
   parser.add_argument('glob', help="glob to grab paths, typicaly 'schema/*.sql' or something. use single-quotes so bash doesn't complete it")
   parser.add_argument('--initial', action='store_true', help="is this an initial commit (i.e. create metadata)")
@@ -92,5 +89,7 @@ def main_inner(args):
     lines.append(f"insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ({sha1}, '{sha2}', '{read_version()}', {['false', 'true'][args.opaque]});")
   return '\n'.join(lines)
 
-if __name__ == '__main__':
+def main():
   print((main_inner(build_parser().parse_args())))
+
+if __name__ == '__main__': main()
