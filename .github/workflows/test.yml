@@ -6,8 +6,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: deps
-      run: pip install -r requirements.txt
-      run: pip install pytest==5.3.2 pylint==2.4.4
+      run: |
+        pip install -r requirements.txt
+        pip install pytest==5.3.2 pylint==2.4.4
     - name: test
       run: pytest
     - name: lint
