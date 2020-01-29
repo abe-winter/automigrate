@@ -10,6 +10,7 @@ setup(
   version=__version__,
   description="Declarative, automatic db migrations using SQL & git as the source of truth",
   author="Abe Winter",
+  author_email="awinter.public+automig@gmail.com",
   url="https://github.com/abe-winter/automigrate",
   packages=find_packages(include=['automig', 'automig.*']),
   entry_points = {
