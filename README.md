@@ -39,11 +39,18 @@ This is beta software and you should be careful with its output.
 
 ## Installation & basic use
 
-(note: you can do most of this stuff with `kube/migrate.sh`, docs coming)
+(note: you can do most of this stuff with `kube/migrate.sh` or `automig_pg`, docs coming)
 
-To install, `pip install automig` (or use `pip3` if that fails). This should install dependencies and register the automig command.
+Installation:
 
-You can fall back to `git+https://github.com/abe-winter/automigrate` if you want latest master.
+```sh
+# standard
+pip install automig
+# if you're planning to use automig_pg to apply migrations on your postgres DB
+pip install automig[postgres]
+# latest git
+pip install git+https://github.com/abe-winter/automigrate
+```
 
 Typical invocations:
 
