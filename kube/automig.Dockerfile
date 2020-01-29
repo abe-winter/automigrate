@@ -1,11 +1,12 @@
-# this runs migration jobs
+# This image runs migration jobs
+
 FROM python:3.7.6-slim
 
 # deps
 RUN apt-get update
-RUN apt-get install postgresql-client git -qqy
+RUN apt-get install libpq-dev git -qqy
 # note: update this to the latest version if it looks old
-RUN pip install automig==0.0.18
+RUN pip install automig[postgres]==0.0.18
 
 # files
 WORKDIR /migrate
@@ -13,4 +14,3 @@ WORKDIR /migrate
 COPY schema schema/
 # note: automig relies on a git repo, normally dockerfiles don't include a git repo
 COPY .git .git/
-COPY migrate.sh .

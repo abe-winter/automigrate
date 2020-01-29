@@ -39,7 +39,7 @@ This is beta software and you should be careful with its output.
 
 ## Installation & basic use
 
-(note: you can do most of this stuff with `kube/migrate.sh` or `automig_pg`, docs coming)
+(note: you can do most of this stuff with `automig_pg`, docs coming)
 
 Installation:
 

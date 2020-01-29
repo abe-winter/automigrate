@@ -13,13 +13,9 @@ spec:
           containers:
           - name: migrate
             image: registry/project/repo/migrate
-            # note: set this to --init for your initial migration
-            command: [./migrate.sh, --update]
+            # note: change `update` to `init` for your initial migration
+            command: [automig_pg, update]
             env:
-            - name: TARGET
-              value: beef0000
-            - name: AUTOMIG_GLOB
-              value: "'schema/*.sql'"
             - name: AUTOMIG_CON
               valueFrom:
                 secretKeyRef:
