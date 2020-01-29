@@ -14,11 +14,14 @@ jobs:
       with:
         python-version: '>=3.6'
     - name: deps
+      working-directory: automigrate
       run: |
         pip install -r requirements.txt
         pip install pytest pylint
         sudo apt-get install git
     - name: test
+      working-directory: automigrate
       run: pytest
     - name: lint
+      working-directory: automigrate
       run: pylint automig
