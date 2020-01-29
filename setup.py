@@ -12,7 +12,7 @@ setup(
   url="https://github.com/abe-winter/automigrate",
   packages=find_packages(include=['automig', 'automig.*']),
   entry_points = {
-    'console_scripts': ['automig=automig.__main__:main'],
+    'console_scripts': ['automig=automig.__main__:main', 'automig_pg=automig.migrate_pg:main'],
   },
   keywords=['sql', 'migration', 'git', 'diff'],
   install_requires=[
@@ -20,6 +20,10 @@ setup(
     'gitpython==2.1.11',
     'pyyaml==5.1',
   ],
+  extras_require={
+    # postgres required for automig_pg script. if install fails, do `apt install libpq-dev`
+    "postgres": ["psycopg2==2.8.4"],
+  },
   python_requires='>=3.6', # for format strings
   long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
   long_description_content_type='text/markdown',
