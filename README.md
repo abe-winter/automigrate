@@ -156,7 +156,7 @@ Happy to accept PRs to generate ORM defs from `create table` stmts (or vice vers
 
 ## Kube integration
 
-At [cloudprogress](https://github.com/cloudprogress), we use this system to apply migrations on out kubernetes cluster. This repo has [instructions for doing migrations on kubernetes](./kube) in the `kube` folder.
+At [cloudprogress](https://github.com/cloudprogress), we use this system to apply migrations on kube. This repo has [instructions for doing migrations on kubernetes](./kube) in the `kube` folder.
 
 ## Development workflow
 
