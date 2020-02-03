@@ -58,6 +58,6 @@ def main():
   elif args.command == 'init':
     init(args)
   else:
-    raise NotImplementedError
+    raise ValueError('unknown command', args.command)
 
 if __name__ == '__main__': main()

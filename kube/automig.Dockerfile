@@ -4,9 +4,10 @@ FROM python:3.7.6-slim
 
 # deps
 RUN apt-get update
+# todo: is libpq-dev necessary with psycopg2-binary?
 RUN apt-get install libpq-dev git -qqy
 # note: update this to the latest version if it looks old
-RUN pip install automig[postgres]==0.0.18
+RUN pip install automig[postgres]==0.0.20
 
 # files
 WORKDIR /migrate

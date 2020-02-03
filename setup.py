@@ -24,7 +24,7 @@ setup(
   ],
   extras_require={
     # postgres required for automig_pg script. if install fails, do `apt install libpq-dev`
-    "postgres": ["psycopg2==2.8.4"],
+    "postgres": ["psycopg2-binary==2.8.4"],
   },
   python_requires='>=3.6', # for format strings
   long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
