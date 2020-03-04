@@ -29,20 +29,15 @@ class WrappedStatement:
     first_fn = next_instance(self.stmt, sqlparse.sql.Function, True)
     return next_instance(first_fn or self.stmt, sqlparse.sql.Parenthesis)
 
-  def decl(self):
-    "helper to get the function element, i.e. the table declaration"
-    # careful: sqlparse is inconsistent for ucase / lcase, hence the two cases here
-    print('self.stmt', list(self.stmt))
-    first_fn = next((expr for expr in self.stmt if isinstance(expr, sqlparse.sql.Function)), None)
-    if first_fn is not None:
-      return first_fn
-    else:
-      raise MiscBadParse("Can't parse table declaration. Did you name a table with a sql keyword?", list(self.stmt))
-
   @property
   def table(self):
     "return table name string"
-    return self.decl().get_name()
+    # careful: sqlparse is inconsistent for ucase / lcase, hence the two cases here
+    first_fn = next_instance(self.stmt, sqlparse.sql.Function, True)
+    if first_fn is not None:
+      return first_fn.get_name()
+    else:
+      return next_instance(self.stmt, sqlparse.sql.Identifier).get_name()
 
 def iswhitespace(token):
   "for splitting purposes, is this ignorable? includes whitespace & comments"

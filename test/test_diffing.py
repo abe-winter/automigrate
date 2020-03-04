@@ -1,24 +1,29 @@
 import pytest, sqlparse, collections
 from automig.lib import diffing, wrappers
 
-def tocase(value, case):
-  if isinstance(value, list):
-    return [tocase(val, case) for val in value]
-  if case == 'upper':
-    return value.upper()
-  elif case == 'lower':
-    return value.lower()
-  else:
-    raise ValueError('unk case', case)
+def tolower(vals):
+  if isinstance(vals, list):
+    return [val.lower() for val in vals]
+  elif isinstance(vals, dict):
+    return {key.lower(): tolower(val) for key, val in vals.items()}
+  return vals.lower()
+
+def toupper(vals):
+  if isinstance(vals, list):
+    return [val.upper() for val in vals]
+  elif isinstance(vals, dict):
+    return {key.upper(): toupper(val) for key, val in vals.items()}
+  return vals.upper()
 
 CREATE_TABLE = [
   'create table t1 (a int);',
   'create table t1 (a int); create table t2 (a int);',
 ]
 
-def test_create_table():
-  delta = diffing.diff(*map(sqlparse.parse, CREATE_TABLE))
-  assert delta == {'t2': ['create table t2 (a int);']}
+@pytest.mark.parametrize('tocase', [tolower, toupper])
+def test_create_table(tocase):
+  delta = diffing.diff(*map(sqlparse.parse, tocase(CREATE_TABLE)))
+  assert delta == tocase({'t2': ['create table t2 (a int);']})
 
 @pytest.mark.skip
 def test_drop_table():
