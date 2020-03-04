@@ -1,24 +1,36 @@
-import pytest, sqlparse, collections
+import pytest, sqlparse, collections, re
 from automig.lib import diffing, wrappers
+
+RE_KEYWORDS = re.compile('create|table|int|primary key|alter|add|column|set|default|not null|type|varchar|unique|index|drop|constraint|on')
+
+def case_keywords(raw, casefn):
+  "helper for case manipulation. ugh"
+  found = RE_KEYWORDS.findall(raw)
+  for keyword in found:
+    raw = raw.replace(keyword, casefn(keyword))
+  return raw
 
 def tolower(vals):
   if isinstance(vals, list):
-    return [val.lower() for val in vals]
+    return [tolower(val) for val in vals]
   elif isinstance(vals, dict):
     return {key.lower(): tolower(val) for key, val in vals.items()}
-  return vals.lower()
+  return case_keywords(vals, str.lower)
 
 def toupper(vals):
   if isinstance(vals, list):
-    return [val.upper() for val in vals]
+    return [toupper(val) for val in vals]
   elif isinstance(vals, dict):
-    return {key.upper(): toupper(val) for key, val in vals.items()}
-  return vals.upper()
+    return {key: toupper(val) for key, val in vals.items()}
+  return case_keywords(vals, str.upper)
 
 CREATE_TABLE = [
   'create table t1 (a int);',
   'create table t1 (a int); create table t2 (a int);',
 ]
+
+def test_case_keywords():
+  assert case_keywords(CREATE_TABLE[0], str.upper) == 'CREATE TABLE t1 (a INT);'
 
 @pytest.mark.parametrize('tocase', [tolower, toupper])
 def test_create_table(tocase):
@@ -35,8 +47,9 @@ ADD_COLUMN = [
   'create table t1 (a int primary key, b int);',
 ]
 
-def test_add_column():
-  delta = diffing.diff(*map(sqlparse.parse, ADD_COLUMN))
+@pytest.mark.parametrize('tocase', [tolower, toupper])
+def test_add_column(tocase):
+  delta = diffing.diff(*map(sqlparse.parse, tocase(ADD_COLUMN)))
   assert delta == {'t1': ['alter table t1 add column b int;']}
 
 ADD_COLUMN_PKEY = [
