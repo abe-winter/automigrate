@@ -2,6 +2,7 @@
 
 ## 0.0.x
 
+* 0.0.21 bugfix: upgrade gitpython version to fix broken transitive dependency
 * 0.0.20 bugfix: psycopg2-binary to simplify / fix docker build
 * 0.0.19
   - feature: `automig_pg` mimics migrate.sh with simpler install step
