@@ -4,7 +4,7 @@ from automig.lib import diffing, wrappers
 RE_KEYWORDS = re.compile('create|table|int|primary key|alter|add|column|set|default|not null|type|varchar|unique|index|drop|constraint|on')
 
 def case_keywords(raw, casefn):
-  "helper for case manipulation. ugh"
+  "helper for case manipulation. ugh. this is necessary because 'alter table' stmts are always lowercase"
   found = RE_KEYWORDS.findall(raw)
   for keyword in found:
     raw = raw.replace(keyword, casefn(keyword))
@@ -50,7 +50,7 @@ ADD_COLUMN = [
 @pytest.mark.parametrize('tocase', [tolower, toupper])
 def test_add_column(tocase):
   delta = diffing.diff(*map(sqlparse.parse, tocase(ADD_COLUMN)))
-  assert delta == {'t1': ['alter table t1 add column b int;']}
+  assert delta == {'t1': [f'alter table t1 add column b {tocase("int")};']}
 
 ADD_COLUMN_PKEY = [
   'create table t1 (b int);',
