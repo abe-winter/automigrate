@@ -1,6 +1,16 @@
 import pytest, sqlparse, collections
 from automig.lib import diffing, wrappers
 
+def tocase(value, case):
+  if isinstance(value, list):
+    return [tocase(val, case) for val in value]
+  if case == 'upper':
+    return value.upper()
+  elif case == 'lower':
+    return value.lower()
+  else:
+    raise ValueError('unk case', case)
+
 CREATE_TABLE = [
   'create table t1 (a int);',
   'create table t1 (a int); create table t2 (a int);',
