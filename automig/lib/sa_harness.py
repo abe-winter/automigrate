@@ -59,7 +59,7 @@ def transform(table_stmts, delim=',\n  '):
           name, type_, dets = column_args(col, pkey_fields)
           cols[name, type_] = dets
       elif isinstance(stmt, wrappers.CreateIndex):
-        paren = stmt.decl()[-1]
+        paren = stmt.paren()
         assert isinstance(paren, sqlparse.sql.Parenthesis)
         index_cols = ['%s_table.c.%s' % (stmt.table, ident) for ident, in wrappers.split_pun(paren)]
         indexes.append(f"{stmt.index_name}_index = sa.Index('{stmt.index_name}', {', '.join(index_cols)})")
