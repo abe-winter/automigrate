@@ -173,8 +173,8 @@ class CreateTable(WrappedStatement):
     return ('create', self.table)
 
   def tail(self):
-    "non-space tokens after column parens"
-    paren_index = next((i for i, expr in enumerate(self.stmt) if isinstance(expr, sqlparse.sql.Function)), None)
+    "non-space tokens after column parens. this will be slightly different in lcase/ucase cases"
+    paren_index = next((i for i, expr in enumerate(self.stmt) if isinstance(expr, (sqlparse.sql.Function, sqlparse.sql.Parenthesis))), None)
     if paren_index is None:
       return None
     tail = self.stmt[paren_index + 1:]

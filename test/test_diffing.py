@@ -1,7 +1,7 @@
 import pytest, sqlparse, collections, re
 from automig.lib import diffing, wrappers
 
-RE_KEYWORDS = re.compile('create|table|int|primary key|alter|add|column|set|default|not null|type|varchar|unique|index|drop|constraint|on')
+RE_KEYWORDS = re.compile('create|table|int|primary key|alter|add|column|set|default|not null|type|varchar|unique|index|drop|constraint|partition|by|on|range')
 
 def case_keywords(raw, casefn):
   "helper for case manipulation. ugh. this is necessary because 'alter table' stmts are always lowercase"
@@ -201,11 +201,11 @@ def test_tail(tocase):
   "directly test CreateTable.tail()"
   no, yes = [wrappers.wrap(parsed[0]) for parsed in map(sqlparse.parse, tocase(PARTITION))]
   assert no.tail() == []
-  assert ['partition', 'by', 'range (a)'] == [tok.value for tok in yes.tail()]
+  assert tocase('partition by range (a)') == ' '.join(map(str, yes.tail()))
 
 def test_partition(tocase):
   assert diffing.diff(*map(sqlparse.parse, tocase(PARTITION)))['whatever'][0].args == \
-    ("can't modify table suffix: `partition by range (a)`",)
+    (f"can't modify table suffix: `{tocase('partition by range (a)')}`",)
 
 UNIQUE = [
   'create table whatever (a text unique);',
@@ -214,4 +214,4 @@ UNIQUE = [
 
 def test_modify_unique(tocase):
   assert diffing.diff(*map(sqlparse.parse, tocase(UNIQUE)))['whatever'] == ['alter table whatever drop constraint whatever_a_key;']
-  assert diffing.diff(*map(sqlparse.parse, tocase(reversed(UNIQUE))))['whatever'][0].args == ("can't add unique constraint, file a bug",)
+  assert diffing.diff(*map(sqlparse.parse, reversed(tocase(UNIQUE))))['whatever'][0].args == ("can't add unique constraint, file a bug",)
