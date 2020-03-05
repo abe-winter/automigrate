@@ -1,5 +1,9 @@
 # automig changelog
 
+## 0.1.x
+
+* 0.1.0 feature: support upper & lowercase SQL in tests
+
 ## 0.0.x
 
 * 0.0.21 bugfix: upgrade gitpython version to fix broken transitive dependency
