@@ -2,132 +2,49 @@
 
 Tool to diff SQL schemas in git and apply the migrations.
 
-Use this if you don't like to manage migrations separately from your declarative schema definitions.
+* [How is this different](#how-is-this-different)
+* [Usage](#usage)
+* [Advanced features](#advanced-features)
 
-* [Warning this is beta software](#beta-software)
-* [Features](#features)
-* [Installation & basic use](#installation--basic-use)
-* [What's happening under the covers](#whats-happening-under-the-covers)
-* [Comparison of migration tools](#comparison-of-migration-tools)
-* [Using with ORMs](#using-with-orms)
-* [Kube integration](#kube-integration)
+## How is this different
 
-## Beta software
+Other schema migration tools work in one of two ways:
 
-This is beta software and you should be careful with its output.
+* Check in 'up' and 'down' migrations, which then get applied to your DB ([alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html) et al). These are most often manual.
+* Compare a live DB to a source of truth and apply the changes ([sqldiff.exe](https://www.sqlite.org/sqldiff.html), [migra](https://github.com/djrobstep/migra), [pgquarrel](https://github.com/eulerto/pgquarrel))
 
-* Eyeball the migrations before applying them
-* Proactively raise github issues for things that seem broken
+This tool only requires you to create and edit the desired state of your database, i.e. a file or folder full of `create table` and `create index` statements. This tool looks at the git history of that file and automatically infers the DDL statements to get from and old point in history to the new one.
 
-## Features
+The **one big difference** is that you don't have to write migrations ever! And every running database has a git version, so you can up- and downgrade it to a desired git sha.
 
-* Operates on `*.sql` files (i.e. files with `create table` and `create index` statements)
-* Operates on git -- meaning that it tracks the git version of applied migration and can create a SQL migration given two git refs
-* Outputs migrations as SQL
-* No need to write or store migrations for simple cases -- they're defined bidirectionally in terms of your git history
-* Ability to specify migrations manually when needed
-* Stores the history of applied migrations in sql in `automigrate_meta` table
+## Usage
 
-## Philosophy
-
-* Defining your schema in your ORM is nuts because it ties you to one language, reduces clarity, and sometimes limits SQL features you can use
-* Existing migration tools don't pull their weight
-* SQL is a more general skill than ORMs and other tools should therefore mirror SQL
-* Mirroring live databases to get a schema is insane because are you tunneling to prod to run your linter? Live DB shouldn't be available to developers. Source of truth should be git.
-* Schema should be versioned using the same git shas as code so the logic is easy to detect if a deploy requires a migration
-
-## Installation & basic use
-
-(note: you can do most of this stuff with `automig_pg`, docs coming)
-
-Installation:
-
-```sh
-# standard
-pip install automig
-# if you're planning to use automig_pg to apply migrations on your postgres DB
-pip install automig[postgres]
-# latest git
-pip install git+https://github.com/abe-winter/automigrate
-```
-
-Typical invocations:
+If you're using postgres:
 
 ```bash
-# create an initial migration (also create meta tables)
-automig 2801578 'test/schema/*.sql' --initial | psql -h 172.17.0.2 -U postgres --single-transaction
-
-# migrate a database
-LAST_SHA=$(psql -h 172.17.0.2 -U postgres -t -c "select sha from automigrate_meta order by id desc limit 1")
-echo migrating from $LAST_SHA
-automig $LAST_SHA...f8b1048 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --single-transaction
-
-# I guess you can just migrate to HEAD if you're feeling lucky
-automig $LAST_SHA...HEAD 'test/schema/*.sql' | psql -h 172.17.0.2 -U postgres --single-transaction
+pip install automig[postgres]
+# set an environment var with postgres connection details
+export AUTOMIG_CON=postgresql://postgres:$PGPASSWORD@host
+# initialize the postgres DB to schema/*.sql
+automig_pg --glob 'schema/*.sql' init
+# update your DB to whatever sha is at git HEAD
+automig_pg --glob 'schema/*.sql' update
+# do a dry-run, show the output without applying it
+automig_pg --preview --glob 'schema/*.sql' update
 ```
 
-## What's happening under the covers
+If you're using another database, you can get the raw SQL for these actions by using the `automig` tool instead of `automig_pg`. (docs coming soon).
 
-Nothing fancy. When you run `automig 2801578...f8b1048 'test/schema/*.sql'` (these are real SHAs in this git repo and will work if you clone the repo), it outputs:
+## Advanced features
 
-```sql
--- changeset created from Namespace(glob='test/schema/*.sql', initial=False, opaque=False, ref='2801578...f8b1048', update_meta=False) at 2019-12-27 15:07:51.545551
--- changes for 2ff9297.t1
-alter table t1 add column b int;
--- changes for f8b1048.t1
-create index t1a on t1 (a);
--- changes for f8b1048.t2
-create table t2 (a int primary key);
-insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ('2801578', '2ff9297cb26c9491c159af728ad6734ad06f8542', '0.0.16', false);
-insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ('2ff9297cb26c9491c159af728ad6734ad06f8542', 'f8b1048fd12b6ef41568801867b67d3ca74904f3', '0.0.16', false);
-```
+* [Instructions for doing kube-native migrations](./kube) are in the `kube` folder.
+* You can skip over bad diffs using `--opaque` mode, docs coming soon
+* You can specify manual overrides for erroring diffs by using [.manualmig.yml file](./.manualmig.yml), docs coming soon.
 
-## Comparison of migration tools
+### Generate ORM definitions from SQL
 
-I did some market research before/during writing this tool. Seems like the landscape is:
-
-### Schema differs
-
-* [prisma lift](https://github.com/prisma/lift) has a declarative schema which *isn't* sql but looks kind of like it, and depends on a runtime DB to generate the migration diff, but seems like a neat tool
-* liquibase might have a [diffing system](https://www.liquibase.org/documentation/diff.html) but from the docs it looks like it's outputting XML. And [they advise you not to use it](http://www.liquibase.org/2007/06/the-problem-with-database-diffs.html)
-* [redgate sql compare](https://documentation.red-gate.com/sc/sql-server-management-studio-add-in/getting-started-with-the-add-in) seems to support comparing 'create table' schemas across git versions, although it looks like you have to find the SHAs by hand in a GUI
-
-### Pure migration managers
-
-(i.e. write the DDL yourself, no automation)
-
-* [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html), as far as I can tell, requires you to generate a skeleton python file for each change then fill it in yourself
-* [sqitch](https://sqitch.org) seems to require manually specifying `deploy` sql (and optionally `revert` & `verify`)
-
-### Tools that diff live DBs
-
-* [sqlite sqldiff.exe](https://www.sqlite.org/sqldiff.html) can diff schemas but operates on full sqlite databases and I'm not sure if it outputs DDL
-* [migra](https://github.com/djrobstep/migra) seems to require two live DBs to run a diff (one with current schema, one with new)
-* [pgquarrel](https://github.com/eulerto/pgquarrel) haven't tried it, seems to use 2 running DBs to generate migration
-
-## Using with ORMs
-
-Your ORM has to be willing to import a schema from create table statements. (I don't know any ORM that does this out of the box, although some can reflect a live DB, like [sqlalchemy's automap](https://docs.sqlalchemy.org/en/latest/orm/extensions/automap.html)).
-
-This repo contains a barebones, mostly untested harness to [generate sqlalchemy models from create table statements](./automig/lib/sa_harness.py). You can run it with:
+Experimental sqlalchemy generator in sa_harness.py. Try it out with:
 
 ```bash
 python -m automig.lib.sa_harness 'test/schema/*.sql'
 ```
-
-Happy to accept PRs to generate ORM defs from `create table` stmts (or vice versa).
-
-## Kube integration
-
-[Instructions for doing migrations on kubernetes](./kube) are in the `kube` folder.
-
-## Development workflow
-
-```bash
-# enable .envrc with `direnv allow` if necessary, or set up your own virtualenv
-# pip install -r requirements.txt
-pip install pytest
-pytest # in repo root
-```
-
-If you want to pitch in on the project, there are a bunch of `@pytest.mark.skip` tests that need to be filled in (most require feature development to get them passing).

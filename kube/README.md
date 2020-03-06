@@ -6,7 +6,7 @@ The stuff in this folder should guide you through attaching automig to your git 
 
 ## This is a beta
 
-This kube-based migration in production use at cloudprogress, but that doesn't mean that it's safe or ready for public consumption. Bear in mind:
+Bear in mind:
 
 1. Warts are to be expected, raise issues if these docs are incomplete / unclear / wrong
 1. That being said, such support is not guaranteed
