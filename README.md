@@ -8,14 +8,14 @@ Tool to diff SQL schemas in git and apply the migrations.
 
 ## How is this different
 
+This tool doesn't make you write & manage a giant folder of up/down migrations. It uses git history to infer them instead, and to version production databases.
+
 Other schema migration tools work in one of two ways:
 
 * Check in 'up' and 'down' migrations, which then get applied to your DB ([alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html) et al). These are most often manual.
 * Compare a live DB to a source of truth and apply the changes ([sqldiff.exe](https://www.sqlite.org/sqldiff.html), [migra](https://github.com/djrobstep/migra), [pgquarrel](https://github.com/eulerto/pgquarrel))
 
 This tool only requires you to create and edit the desired state of your database, i.e. a file or folder full of `create table` and `create index` statements. This tool looks at the git history of that file and automatically infers the DDL statements to get from and old point in history to the new one.
-
-The **one big difference** is that you don't have to write migrations ever! And every running database has a git version, so you can up- and downgrade it to a desired git sha.
 
 ## Usage
 
