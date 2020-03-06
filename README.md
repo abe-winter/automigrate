@@ -1,6 +1,6 @@
 # automigrate
 
-Tool to diff SQL schemas in git and apply the migrations.
+Automigrate is a command-line tool for SQL migrations. Unlike other migration tools, it uses git history to do diffs on `create table` statements instead of forcing you to write up/down diffs for every change.
 
 * [How is this different](#how-is-this-different)
 * [Usage](#usage)
