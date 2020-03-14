@@ -25,9 +25,9 @@ If you're using postgres:
 pip install automig[postgres]
 # set an environment var with postgres connection details
 export AUTOMIG_CON=postgresql://postgres:$PGPASSWORD@host
-# initialize the postgres DB to schema/*.sql
+# initialize the postgres DB to schema/*.sql -- do this once to create a DB
 automig_pg --glob 'schema/*.sql' init
-# update your DB to whatever sha is at git HEAD
+# update your DB to whatever sha is at git HEAD -- do this whenever your schema changes
 automig_pg --glob 'schema/*.sql' update
 # do a dry-run, show the output without applying it
 automig_pg --preview --glob 'schema/*.sql' update
@@ -40,6 +40,7 @@ If you're using another database, you can get the raw SQL for these actions by u
 * [Instructions for doing kube-native migrations](./kube) are in the `kube` folder.
 * You can skip over bad diffs using `--opaque` mode, docs coming soon
 * You can specify manual overrides for erroring diffs by using [.manualmig.yml file](./.manualmig.yml), docs coming soon.
+* Convert an existing DB to use automig -- please post a github issue if you have this issue and I'll add instructions
 
 ### Generate ORM definitions from SQL
 
