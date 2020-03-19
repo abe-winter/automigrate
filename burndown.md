@@ -14,7 +14,7 @@
 * undo, i.e. what would be 'down' in a typical migration tool.
   - [ ] This may work out of the box (pass `HEAD...HEAD~1` instead of `HEAD~1...HEAD`), but needs tests
   - [ ] up/down sections in .manualmig.yml
-* documentation for:
+* documentation for (THIS IS TOP PRIORITY AFTER 0.1):
   - [ ] writing schema files
   - [ ] creating an initial migration
   - [ ] checklist for running migrations: determining last sha, inspecting migration, running migration (postgres / mysql)
@@ -25,11 +25,11 @@
 
 ## Burndown
 
+* [ ] [0.2.0] `.manualmig.yml` skip section for skipping bad migrations that need to be opaque (THIS IS TOP PRIORITY FOR 0.2)
 * [ ] [0.2.0] enums
 * [ ] [0.2.0] integration test with mysql and postgres
 * [ ] [0.2.0] take more than one glob
 * [ ] [0.2.0] test 'create extension' and support if not working
-* [ ] [0.2.0] `.manualmig.yml` skip section for skipping bad migrations that need to be opaque
 * [ ] [0.2.0] ensure capitalized keywords support in test suite
 * [ ] [0.2.0] command to list dangerous operations in a diff (anything that drops data or schemas, any big / slow locking operations), so users can require CI signoff
 * [ ] [0.2.0] design & test master-branch-only mode (because committing cross-branch migrations can cause trouble with squash commits)
