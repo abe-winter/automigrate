@@ -164,6 +164,11 @@ EDIT_INDEX = [
   'create index idx_col1 on t1 (col1, col2);',
 ]
 
+def test_no_index_name(tocase):
+  # nobody should be using unnamed indexes with automig, the tool doesn't know the created name, but this is testing for a crash
+  wrapped = wrappers.wrap(sqlparse.parse(tocase('create index on t1 (a);'))[0])
+  assert wrapped.index_name is None
+
 def test_edit_index(tocase):
   assert diffing.diff(*map(sqlparse.parse, tocase(EDIT_INDEX)))['t1'] == [
     'drop index idx_col1;',

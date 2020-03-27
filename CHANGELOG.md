@@ -2,6 +2,8 @@
 
 ## 0.1.x
 
+* unreleased
+  -  bugfix: don't crash in `index_name` when index is unnamed (though anon indexes may cause other problems downstream)
 * 0.1.0 feature: support upper & lowercase SQL in tests
 
 ## 0.0.x

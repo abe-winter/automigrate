@@ -190,8 +190,10 @@ class CreateIndex(WrappedStatement):
     index_index = next(i for i, tok in enumerate(self.stmt) if tok.ttype and tok.ttype[-1] == 'Keyword' and tok.value.lower() == 'index')
     on_index = next(i for i, tok in enumerate(self.stmt) if tok.ttype and tok.ttype[-1] == 'Keyword' and tok.value.lower() == 'on')
     block = self.stmt[index_index:on_index]
-    ident, = next(tok for tok in block if isinstance(tok, sqlparse.sql.Identifier))
-    return ident.value
+    tok = next((tok for tok in block if isinstance(tok, sqlparse.sql.Identifier)), None)
+    if tok is None:
+      return None
+    return tok[0].value
 
   @property
   def unique(self):
