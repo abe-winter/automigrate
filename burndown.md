@@ -9,8 +9,6 @@
 * [ ] Be careful with using unescaped keywords as names (i.e. a table named table) -- you'll likely confuse the parser even where your sql engine allows it
 * [ ] This hasn't been tested on a wide range of syntax (i.e. arrays / json)
 * [ ] Not sure if capitalized SQL keywords are supported (todo add tests)
-* [ ] check that drop table / drop index works when removed from schema (and support some kind of placeholder to suppress deletion)
-* [ ] Need a way to check live schema against desired to call out problems
 * undo, i.e. what would be 'down' in a typical migration tool.
   - [ ] This may work out of the box (pass `HEAD...HEAD~1` instead of `HEAD~1...HEAD`), but needs tests
   - [ ] up/down sections in .manualmig.yml
@@ -25,11 +23,16 @@
 
 ## Burndown
 
-* [ ] [0.2.0] `.manualmig.yml` skip section for skipping bad migrations that need to be opaque (THIS IS TOP PRIORITY FOR 0.2)
-* [ ] [0.2.0] enums
-* [ ] [0.2.0] integration test with mysql and postgres
-* [ ] [0.2.0] take more than one glob
-* [ ] [0.2.0] test 'create extension' and support if not working
-* [ ] [0.2.0] ensure capitalized keywords support in test suite
-* [ ] [0.2.0] command to list dangerous operations in a diff (anything that drops data or schemas, any big / slow locking operations), so users can require CI signoff
-* [ ] [0.2.0] design & test master-branch-only mode (because committing cross-branch migrations can cause trouble with squash commits)
+### 0.2.0
+
+* [ ] `.manualmig.yml` skip section for skipping bad migrations that need to be opaque (THIS IS TOP PRIORITY FOR 0.2)
+* [ ] enums
+* [ ] take more than one glob
+* [ ] test 'create extension' and support if not working
+* [ ] command to list dangerous operations in a diff (anything that drops data or schemas, any big / slow locking operations), so users can require CI signoff
+* [ ] way to do a test run on working dir w/ rollback
+
+### 0.3.0
+
+* [ ] integration test with mysql and postgres
+* [ ] design drop table
