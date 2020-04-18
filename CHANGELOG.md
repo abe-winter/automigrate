@@ -6,6 +6,7 @@
   - bugfix: don't crash in `index_name` when index is unnamed (though anon indexes may cause other problems downstream)
   - bugfix: sa\_harness was broken
   - feature: nullable, boolean for sa\_harness
+  - deps: use `>=` for pyyaml dep for compatibility
 * 0.1.0 feature: support upper & lowercase SQL in tests
 
 ## 0.0.x

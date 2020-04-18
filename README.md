@@ -17,6 +17,18 @@ Other schema migration tools work in one of two ways:
 
 This tool only requires you to create and edit the desired state of your database, i.e. a file or folder full of `create table` and `create index` statements. This tool looks at the git history of that file and automatically infers the DDL statements to get from and old point in history to the new one.
 
+Seriously, all you have to do is maintain a file like this:
+
+```sql
+-- schema.sql
+create table whatever (
+  userid uuid primary key,
+  age_at_birth int default 0
+);
+```
+
+And when you add a field to the create table statement, automig figures out the 'alter table'. No writing *or* checking in migrations.
+
 ## Usage
 
 If you're using postgres:
