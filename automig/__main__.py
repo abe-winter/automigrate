@@ -87,7 +87,7 @@ def main_inner(args):
   for sha1, sha2 in zip(shas[:-1], shas[1:]):
     # todo: hard w/out depending on a sql driver but do some kind of escaping here
     sha1 = f"'{sha1}'" if sha1 is not None else 'NULL'
-    now = "time('now')" if args.dialect == 'sqlite' else 'now()'
+    now = "datetime('now')" if args.dialect == 'sqlite' else 'now()'
     lines.append(f"insert into automigrate_meta (fromsha, sha, automig_version, opaque, applied) values ({sha1}, '{sha2}', '{__version__}', {['false', 'true'][args.opaque]}, {now});")
   return '\n'.join(lines)
 
