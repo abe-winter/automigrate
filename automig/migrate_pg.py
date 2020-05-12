@@ -51,6 +51,7 @@ def create_parser(doc):
 
 def main():
   args = create_parser(__doc__).parse_args()
+  assert args.automig_con, "pass --automig-con param or AUTOMIG_CON in env"
   if args.command == 'update':
     update(args)
   elif args.command == 'init':
