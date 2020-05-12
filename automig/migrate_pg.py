@@ -37,18 +37,20 @@ def update(args):
       cur.execute(sql)
       con.commit()
 
-def main():
-  parser = argparse.ArgumentParser(description=__doc__)
+def create_parser(doc):
+  parser = argparse.ArgumentParser(description=doc)
   parser.add_argument('--target', default="HEAD", help="Target sha or git ref to migrate to / initialize with")
   parser.add_argument('--glob', default="schema/*.sql", help="Path glob, gets passed down to automig")
   parser.add_argument('--preview', action="store_true", help="Do a dry-run. Show what the change would be without applying it")
   parser.add_argument('--automig-con', help="postgres connection string. if missing, tries to get AUTOMIG_CON from env")
   sub = parser.add_subparsers(dest='command')
-  cmd_init = sub.add_parser('init', help="initialize a schema at target, install meta tables if missing")
+  sub.add_parser('init', help="initialize a schema at target, install meta tables if missing")
   cmd_update = sub.add_parser('update', help="Read latest commit from DB and update to target")
   cmd_update.add_argument('--opaque', action='store_true', help="Pass down to automig")
+  return parser
 
-  args = parser.parse_args()
+def main():
+  args = create_parser(__doc__).parse_args()
   if not args.automig_con:
     # intentional crash if missing
     args.automig_con = os.environ['AUTOMIG_CON']
