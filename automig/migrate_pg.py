@@ -8,7 +8,7 @@ from .__main__ import build_parser, main_inner
 def init(args, connect=psycopg2.connect, dialect='postgres'):
   "body for `init` command"
 	# eval "automig $TARGET $AUTOMIG_GLOB --initial" | psql $AUTOMIG_CON --single-transaction
-  sql = main_inner(build_parser().parse_args([args.target, args.glob, '--initial']))
+  sql = main_inner(build_parser().parse_args([args.target, args.glob, '--initial', '--dialect', dialect]))
   print(sql)
   if args.preview:
     return
@@ -27,7 +27,7 @@ def update(args, connect=psycopg2.connect, dialect='postgres'):
   last_sha, = cur.fetchone()
   range_ = f"{last_sha}...{args.target}"
   print("range is", range_)
-  pass_down_args = [range_, args.glob]
+  pass_down_args = [range_, args.glob, '--dialect', dialect]
   if args.opaque:
     pass_down_args.append('--opaque')
   sql = main_inner(build_parser().parse_args(pass_down_args))
