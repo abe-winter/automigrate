@@ -14,7 +14,11 @@ setup(
   url="https://github.com/abe-winter/automigrate",
   packages=find_packages(include=['automig', 'automig.*']),
   entry_points = {
-    'console_scripts': ['automig=automig.__main__:main', 'automig_pg=automig.migrate_pg:main'],
+    'console_scripts': [
+      'automig=automig.__main__:main',
+      'automig_pg=automig.migrate_pg:main',
+      'automig_sqlite=automig.automig_sqlite:main',
+    ],
   },
   keywords=['sql', 'migration', 'git', 'diff'],
   install_requires=[
