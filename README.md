@@ -47,6 +47,8 @@ automig_pg --preview --glob 'schema/*.sql' update
 
 If you're using another database, you can get the raw SQL for these actions by using the `automig` tool instead of `automig_pg`. (docs coming soon).
 
+Postgres is the primary database I test on, with sqlite support secondary.
+
 ## Advanced features
 
 * [Instructions for doing kube-native migrations](./kube) are in the `kube` folder.

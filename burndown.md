@@ -26,6 +26,7 @@
 ### 0.1.1 (sqlite)
 
 * [x] automig\_sqlite command
+* [x] basic integration test for automig\_pg
 * [ ] run some of the schema transformations on a sqlite db in test
 
 ### 0.1.2
