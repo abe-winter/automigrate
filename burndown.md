@@ -28,6 +28,10 @@
 * [x] automig\_sqlite command
 * [ ] run some of the schema transformations on a sqlite db in test
 
+### 0.1.2
+
+* [ ] keep glob string in history; changing glob should be an intentional thing, not an accident. glob should only be in `init`, reuse in update
+
 ### 0.2.0
 
 * [ ] `.manualmig.yml` skip section for skipping bad migrations that need to be opaque (THIS IS TOP PRIORITY FOR 0.2)

@@ -8,9 +8,9 @@ def main():
   args = create_parser(__doc__).parse_args()
   assert args.automig_con, "pass --automig-con param or AUTOMIG_CON in env"
   if args.command == 'update':
-    update(args, sqlite3.connect)
+    update(args, connect=sqlite3.connect, dialect='sqlite')
   elif args.command == 'init':
-    init(args, sqlite3.connect)
+    init(args, connect=sqlite3.connect, dialect='sqlite')
   else:
     raise ValueError('unknown command', args.command)
 

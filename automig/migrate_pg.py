@@ -5,37 +5,44 @@ import argparse, os
 import psycopg2 # pylint: disable=import-error
 from .__main__ import build_parser, main_inner
 
-def init(args, connect=psycopg2.connect):
+def init(args, connect=psycopg2.connect, dialect='postgres'):
   "body for `init` command"
 	# eval "automig $TARGET $AUTOMIG_GLOB --initial" | psql $AUTOMIG_CON --single-transaction
   sql = main_inner(build_parser().parse_args([args.target, args.glob, '--initial']))
   print(sql)
   if args.preview:
     return
-  with connect(args.automig_con) as con, con.cursor() as cur:
-    cur.execute(sql)
-    con.commit()
+  con = connect(args.automig_con)
+  if dialect == 'sqlite':
+    con.cursor().executescript(sql)
+  else:
+    con.cursor().execute(sql)
+  con.commit()
 
-def update(args, connect=psycopg2.connect):
+def update(args, connect=psycopg2.connect, dialect='postgres'):
   "body for `update` command"
-  with connect(args.automig_con) as con, con.cursor() as cur:
-    cur.execute('select sha from automigrate_meta order by id desc limit 1')
-    last_sha, = cur.fetchone()
-    range_ = f"{last_sha}...{args.target}"
-    print("range is", range_)
-    pass_down_args = [range_, args.glob]
-    if args.opaque:
-      pass_down_args.append('--opaque')
-    sql = main_inner(build_parser().parse_args(pass_down_args))
-    print(sql)
-    if args.preview:
-      return
-    empty = not any(not line.startswith('--') for line in sql.splitlines())
-    if empty:
-      print('update is empty, skipping')
+  con = connect(args.automig_con)
+  cur = con.cursor()
+  cur.execute('select sha from automigrate_meta order by id desc limit 1')
+  last_sha, = cur.fetchone()
+  range_ = f"{last_sha}...{args.target}"
+  print("range is", range_)
+  pass_down_args = [range_, args.glob]
+  if args.opaque:
+    pass_down_args.append('--opaque')
+  sql = main_inner(build_parser().parse_args(pass_down_args))
+  print(sql)
+  if args.preview:
+    return
+  empty = not any(not line.startswith('--') for line in sql.splitlines())
+  if empty:
+    print('update is empty, skipping')
+  else:
+    if dialect == 'sqlite':
+      con.cursor().executescript(sql)
     else:
-      cur.execute(sql)
-      con.commit()
+      con.cursor().execute(sql)
+    con.commit()
 
 def create_parser(doc):
   parser = argparse.ArgumentParser(description=doc)
