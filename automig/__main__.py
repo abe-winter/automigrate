@@ -18,26 +18,27 @@ def build_parser():
   parser.add_argument('--initial', action='store_true', help="is this an initial commit (i.e. create metadata)")
   parser.add_argument('--update-meta', action='store_true', help="apply / update the preamble; this may only work with postgres")
   parser.add_argument('--opaque', action='store_true')
+  parser.add_argument('--dialect', choices=('postgres', 'sqlite'), default='postgres')
   return parser
 
 # this creates the meta tables
 PREAMBLE = """
 -- meta_meta stores the meta version
-create table if not exists automigrate_meta_meta (id serial primary key, meta_version int, applied timestamp default now());
-insert into automigrate_meta_meta (meta_version) values (3);
+create table if not exists automigrate_meta_meta (id serial primary key, meta_version int, applied timestamp);
+insert into automigrate_meta_meta (meta_version) values (4);
 
 -- meta stores the schema version
-create table if not exists automigrate_meta (id serial primary key, sha text, applied timestamp default now(), fromsha text, opaque bool, automig_version text);
+create table if not exists automigrate_meta (id serial primary key, sha text, applied timestamp, fromsha text, opaque bool, automig_version text);
 """
 
 POSTGRES_PREAMBLE = """
 -- meta_meta stores the meta version
 create table if not exists automigrate_meta_meta (id serial primary key, meta_version int);
-alter table automigrate_meta_meta add column if not exists applied timestamp default now();
-insert into automigrate_meta_meta (meta_version) values (3);
+alter table automigrate_meta_meta add column if not exists applied timestamp;
+insert into automigrate_meta_meta (meta_version) values (4, now());
 
 -- meta stores the schema version
-create table if not exists automigrate_meta (id serial primary key, sha text, applied timestamp default now());
+create table if not exists automigrate_meta (id serial primary key, sha text, applied timestamp);
 alter table automigrate_meta add column if not exists fromsha text;
 alter table automigrate_meta add column if not exists opaque bool;
 alter table automigrate_meta add column if not exists automig_version text;
@@ -86,7 +87,8 @@ def main_inner(args):
   for sha1, sha2 in zip(shas[:-1], shas[1:]):
     # todo: hard w/out depending on a sql driver but do some kind of escaping here
     sha1 = f"'{sha1}'" if sha1 is not None else 'NULL'
-    lines.append(f"insert into automigrate_meta (fromsha, sha, automig_version, opaque) values ({sha1}, '{sha2}', '{__version__}', {['false', 'true'][args.opaque]});")
+    now = "datetime('now')" if args.dialect == 'sqlite' else 'now()'
+    lines.append(f"insert into automigrate_meta (fromsha, sha, automig_version, opaque, applied) values ({sha1}, '{sha2}', '{__version__}', {['false', 'true'][args.opaque]}, {now});")
   return '\n'.join(lines)
 
 def main():
