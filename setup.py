@@ -24,7 +24,7 @@ setup(
   install_requires=[
     'sqlparse==0.3.0',
     'gitpython==3.1.0',
-    'pyyaml==5.1',
+    'pyyaml>=5.1',
   ],
   extras_require={
     # postgres required for automig_pg script. if install fails, do `apt install libpq-dev`
