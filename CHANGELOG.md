@@ -2,6 +2,8 @@
 
 ## 0.1.x
 
+* unreleased
+  - internal: looser yaml dep for compat with other packages
 * 0.1.1
   - bugfix: don't crash in `index_name` when index is unnamed (though anon indexes may cause other problems downstream)
   - bugfix: sa\_harness was broken
