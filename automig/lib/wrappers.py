@@ -153,6 +153,8 @@ class CreateTable(WrappedStatement):
       Column(group)
       for group in self.groups()
       # note: this guard blocks 'primary key (a,b)' kind of thing
+      # warning: accidentally naming a column with a keyword really messes with things; have a small whitelist of keywords
+      # 'body text' is an example it doesn't like
       if isinstance(group[0], sqlparse.sql.Identifier)
     ]
 
