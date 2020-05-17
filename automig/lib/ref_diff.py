@@ -11,7 +11,7 @@ def files_to_smts(fulltexts):
     stmts.extend(sqlparse.parse(text))
   return stmts
 
-def ref_diff(repo, ref1, ref2, pattern):
+def ref_diff(args, repo, ref1, ref2, pattern):
   "given repo, refs & glob pattern, return list of uniquely identified statements making up diff (or uniquely ID'd errors)"
   contents = (
     githelp.get_streams(repo.commit(ref).tree, pattern)
@@ -21,9 +21,10 @@ def ref_diff(repo, ref1, ref2, pattern):
     files_to_smts(fulltexts)
     for fulltexts in contents
   ]
-  return diffing.diff(left, right)
+  return diffing.diff(args, left, right)
 
-def ref_range_diff(repo, ref1, ref2, pattern, opaque=False):
+# pylint: disable=too-many-arguments
+def ref_range_diff(args, repo, ref1, ref2, pattern, opaque=False):
   "run ref_diff() once per intermediate commit for commits who change files matching pattern"
   assert not os.path.isabs(pattern), "we don't know how to transform glob to absolute path -- file a bug"
   assert os.path.isabs(repo.working_dir), "working dir is non-abs -- file a bug"
@@ -42,7 +43,7 @@ def ref_range_diff(repo, ref1, ref2, pattern, opaque=False):
     commits.append(repo.commit(ref1))
     commits = list(reversed(commits))
   return collections.OrderedDict([
-    [right.hexsha, ref_diff(repo, left.hexsha, right.hexsha, str(absglob))]
+    [right.hexsha, ref_diff(args, repo, left.hexsha, right.hexsha, str(absglob))]
     for left, right in zip(commits[:-1], commits[1:])
   ])
 

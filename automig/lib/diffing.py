@@ -54,7 +54,7 @@ def diff_column(table, colname, left, right):
 
 # todo: refactor, this is too complicated
 # pylint: disable=too-many-branches
-def diff_stmt(left, right):
+def diff_stmt(args, left, right):
   "diff two WrappedStmt with same unique key. return list of statements to run."
   assert left.unique == right.unique
   table = left.table
@@ -76,7 +76,11 @@ def diff_stmt(left, right):
         changes.extend(diff_column(table, left_col.name, left_col.parse(), right_col.parse()))
     for k in left_cols:
       if k not in right_cols:
-        changes.append(f'alter table {table} drop column {k};')
+        edit = f'alter table {table} drop column {k};'
+        if args.dialect == 'sqlite':
+          changes.append(f"-- {edit} -- sqlite doesn't drop columns")
+        else:
+          changes.append(edit)
     if left.tail() != right.tail():
       change = ' '.join([expr.value for expr in left.tail() or right.tail()])
       changes.append(UnsupportedChange(f"can't modify table suffix: `{change}`"))
@@ -101,7 +105,7 @@ def diff_stmt(left, right):
   else:
     raise DiffError("unhandled type", type(left))
 
-def diff_stmts(left, right):
+def diff_stmts(args, left, right):
   "takes WrappedStmt lists, all for same table, and compares them"
   key_l = {stmt.unique: stmt for stmt in left}
   key_r = {stmt.unique: stmt for stmt in right}
@@ -112,10 +116,10 @@ def diff_stmts(left, right):
     elif key_l[k] == key_r[k]:
       pass # not relevant to diff
     else:
-      output.extend(diff_stmt(key_l[k], key_r[k]))
+      output.extend(diff_stmt(args, key_l[k], key_r[k]))
   return output
 
-def diff(left, right):
+def diff(args, left, right):
   """take two lists of statements.
   return dict of {tablename: list of migration statements or errors}
   """
@@ -126,7 +130,7 @@ def diff(left, right):
   output = collections.OrderedDict()
   for key, stmts in groups_r.items():
     if key in groups_l:
-      changes = diff_stmts(groups_l[key], stmts)
+      changes = diff_stmts(args, groups_l[key], stmts)
       if changes:
         output[key] = changes
     else:

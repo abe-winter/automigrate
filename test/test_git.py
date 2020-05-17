@@ -1,5 +1,6 @@
 import git, glob, pytest, sqlparse, os
 from automig.lib import githelp, ref_diff, diffing
+from .test_diffing import ARGS
 
 SHAS = {
   'create-t1': '2801578',
@@ -16,17 +17,17 @@ def test_get_paths():
 
 @pytest.mark.skip
 def test_create():
-  diff = ref_diff.ref_range_diff(git.Repo(), SHAS['create-t1'], SHAS['add-t1-col'], GLOB)
+  diff = ref_diff.ref_range_diff(ARGS, git.Repo(), SHAS['create-t1'], SHAS['add-t1-col'], GLOB)
   raise NotImplementedError
 
 def test_addcol():
-  diff = ref_diff.ref_range_diff(git.Repo(), SHAS['create-t1'], SHAS['add-t1-col'], GLOB)
+  diff = ref_diff.ref_range_diff(ARGS, git.Repo(), SHAS['create-t1'], SHAS['add-t1-col'], GLOB)
   assert diff == {
     SHAS['add-t1-col']: {'t1': ['alter table t1 add column b int;']},
   }
 
 def test_add_multi_commit():
-  diff = ref_diff.ref_range_diff(git.Repo(), SHAS['create-t1'], SHAS['add-t2-t1a'], GLOB)
+  diff = ref_diff.ref_range_diff(ARGS, git.Repo(), SHAS['create-t1'], SHAS['add-t2-t1a'], GLOB)
   assert diff == {
     SHAS['add-t1-col']: {
       't1': ['alter table t1 add column b int;'],
@@ -38,7 +39,7 @@ def test_add_multi_commit():
   }
 
 def test_add_multi_commit_opaque():
-  diff = ref_diff.ref_range_diff(git.Repo(), SHAS['create-t1'], SHAS['add-t2-t1a'], GLOB, opaque=True)
+  diff = ref_diff.ref_range_diff(ARGS, git.Repo(), SHAS['create-t1'], SHAS['add-t2-t1a'], GLOB, opaque=True)
   assert diff == {SHAS['add-t2-t1a']: {
     't1': ['alter table t1 add column b int;', 'create index t1a on t1 (a);'],
     't2': ['create table t2 (a int primary key);'],
@@ -50,7 +51,7 @@ MOD_COLUMN = [
 ]
 
 def test_error_bubbling():
-  sha_table_stmts = {'sha': diffing.diff(*map(sqlparse.parse, MOD_COLUMN))}
+  sha_table_stmts = {'sha': diffing.diff(ARGS, *map(sqlparse.parse, MOD_COLUMN))}
   errors = ref_diff.extract_errors(sha_table_stmts)
   manual = {'sha': {'t1': ['hello']}}
   remaining = ref_diff.try_repair_errors(errors, manual, sha_table_stmts)

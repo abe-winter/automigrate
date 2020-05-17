@@ -68,7 +68,7 @@ def main_inner(args):
     assert len(rev_tuple) == 2, "must pass a sha range or set --initial"
     # todo: look up rev_tuple[0] so this isn't a short sha or HEAD~1 or something
     shas.append(rev_tuple[0])
-    changes = ref_diff.ref_range_diff(git.Repo(search_parent_directories=True), *rev_tuple, args.glob, opaque=args.opaque)
+    changes = ref_diff.ref_range_diff(args, git.Repo(search_parent_directories=True), *rev_tuple, args.glob, opaque=args.opaque)
     errors = ref_diff.extract_errors(changes)
     if errors:
       # todo: this is wrong. manual_mig should override whether or not there are errors

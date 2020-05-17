@@ -3,6 +3,12 @@ from automig.lib import diffing, wrappers
 
 RE_KEYWORDS = re.compile('create|table|int|primary key|alter|add|column|set|default|not null|type|varchar|unique|index|drop|constraint|partition|by|on|range')
 
+ARGS = collections.namedtuple('args', 'dialect')('postgres')
+
+def diff_parse(stmts):
+  "wrapper helper"
+  return diffing.diff(ARGS, *map(sqlparse.parse, stmts))
+
 def case_keywords(raw, casefn):
   "helper for case manipulation. ugh. this is necessary because 'alter table' stmts are always lowercase"
   found = RE_KEYWORDS.findall(raw)
@@ -37,7 +43,7 @@ def test_case_keywords():
   assert case_keywords(CREATE_TABLE[0], str.upper) == 'CREATE TABLE t1 (a INT);'
 
 def test_create_table(tocase):
-  delta = diffing.diff(*map(sqlparse.parse, tocase(CREATE_TABLE)))
+  delta = diff_parse(tocase(CREATE_TABLE))
   assert delta == tocase({'t2': ['create table t2 (a int);']})
 
 @pytest.mark.skip
@@ -51,7 +57,7 @@ ADD_COLUMN = [
 ]
 
 def test_add_column(tocase):
-  delta = diffing.diff(*map(sqlparse.parse, tocase(ADD_COLUMN)))
+  delta = diff_parse(tocase(ADD_COLUMN))
   assert delta == {'t1': [f'alter table t1 add column b {tocase("int")};']}
 
 ADD_COLUMN_PKEY = [
@@ -61,7 +67,7 @@ ADD_COLUMN_PKEY = [
 
 def test_add_column_pkey(tocase):
   "this is testing that this doesn't also do an 'alter table add primary key'"
-  assert diffing.diff(*map(sqlparse.parse, tocase(ADD_COLUMN_PKEY)))['t1'] == \
+  assert diff_parse(tocase(ADD_COLUMN_PKEY))['t1'] == \
     [f'alter table t1 add column a {tocase("int primary key")};']
 
 MODIFY_COLUMN = [
@@ -73,7 +79,7 @@ MODIFY_COLUMN = [
 ]
 
 def test_modify_column(tocase):
-  assert diffing.diff(*map(sqlparse.parse, tocase(MODIFY_COLUMN))) == {'t1': [
+  assert diff_parse(tocase(MODIFY_COLUMN)) == {'t1': [
     'alter table t1 alter column b set default 20;',
     'alter table t1 alter column c set not null;',
     f'alter table t1 alter column d type {tocase("varchar")}(24);',
@@ -112,7 +118,7 @@ DROP_COLUMN = [
 ]
 
 def test_drop_column(tocase):
-  delta = diffing.diff(*map(sqlparse.parse, tocase(DROP_COLUMN)))
+  delta = diff_parse(tocase(DROP_COLUMN))
   assert delta == {'t1': ['alter table t1 drop column b;']}
 
 DROP_COLUMN_PKEY = [
@@ -122,7 +128,7 @@ DROP_COLUMN_PKEY = [
 
 def test_drop_column_pkey(tocase):
   "this is testing that the 'drop constraint' comes before the 'drop column'"
-  assert diffing.diff(*map(sqlparse.parse, tocase(DROP_COLUMN_PKEY)))['t1'] == \
+  assert diff_parse(tocase(DROP_COLUMN_PKEY))['t1'] == \
     ['alter table t1 drop constraint t1_pkey;', 'alter table t1 drop column a;']
 
 MODIFY_KEY_1 = [
@@ -141,14 +147,14 @@ MODIFY_KEY_3 = [
 ]
 
 def test_modify_key(tocase):
-  assert not diffing.diff(*map(sqlparse.parse, tocase(MODIFY_KEY_1)))
-  assert diffing.diff(*map(sqlparse.parse, tocase(MODIFY_KEY_2)))['t1'] == [
+  assert not diff_parse(tocase(MODIFY_KEY_1))
+  assert diff_parse(tocase(MODIFY_KEY_2))['t1'] == [
     'alter table t1 drop constraint t1_pkey;',
     f'alter table t1 add column b {tocase("int")};',
     'alter table t1 add primary key (a, b);',
   ]
-  assert diffing.diff(*map(sqlparse.parse, MODIFY_KEY_3))['t1'] == ['alter table t1 drop constraint t1_pkey;']
-  assert diffing.diff(*map(sqlparse.parse, reversed(MODIFY_KEY_3)))['t1'] == ['alter table t1 add primary key (a);',]
+  assert diff_parse(MODIFY_KEY_3)['t1'] == ['alter table t1 drop constraint t1_pkey;']
+  assert diff_parse(reversed(MODIFY_KEY_3))['t1'] == ['alter table t1 add primary key (a);',]
 
 CREATE_INDEX = [
   'create unique index idx_col1 on t1 (col1);',
@@ -156,7 +162,7 @@ CREATE_INDEX = [
 ]
 
 def test_add_index(tocase):
-  delta = diffing.diff(*map(sqlparse.parse, tocase(CREATE_INDEX)))
+  delta = diff_parse(tocase(CREATE_INDEX))
   assert delta == tocase({'t1': ['create unique index idx_col2 on t1 (col2);']})
 
 EDIT_INDEX = [
@@ -170,7 +176,7 @@ def test_no_index_name(tocase):
   assert wrapped.index_name is None
 
 def test_edit_index(tocase):
-  assert diffing.diff(*map(sqlparse.parse, tocase(EDIT_INDEX)))['t1'] == [
+  assert diff_parse(tocase(EDIT_INDEX))['t1'] == [
     'drop index idx_col1;',
     tocase('create index idx_col1 on t1 (col1, col2);'),
   ]
@@ -186,7 +192,7 @@ NEWLINE = [
 
 def test_newline(tocase):
   # this isn't asserting anything -- checking for a bug which caused a crash
-  diffing.diff(*map(sqlparse.parse, tocase(NEWLINE)))
+  diff_parse(tocase(NEWLINE))
 
 COMMENT = [
   'create table whatever (\n  a int -- hello\n);',
@@ -195,7 +201,7 @@ COMMENT = [
 
 def test_comments(tocase):
   # not asserting, just checking for crash
-  diffing.diff(*map(sqlparse.parse, tocase(COMMENT)))
+  diff_parse(tocase(COMMENT))
 
 PARTITION = [
   'create table whatever (a boolean primary key);',
@@ -209,7 +215,7 @@ def test_tail(tocase):
   assert tocase('partition by range (a)') == ' '.join(map(str, yes.tail()))
 
 def test_partition(tocase):
-  assert diffing.diff(*map(sqlparse.parse, tocase(PARTITION)))['whatever'][0].args == \
+  assert diff_parse(tocase(PARTITION))['whatever'][0].args == \
     (f"can't modify table suffix: `{tocase('partition by range (a)')}`",)
 
 UNIQUE = [
@@ -218,5 +224,5 @@ UNIQUE = [
 ]
 
 def test_modify_unique(tocase):
-  assert diffing.diff(*map(sqlparse.parse, tocase(UNIQUE)))['whatever'] == ['alter table whatever drop constraint whatever_a_key;']
-  assert diffing.diff(*map(sqlparse.parse, reversed(tocase(UNIQUE))))['whatever'][0].args == ("can't add unique constraint, file a bug",)
+  assert diff_parse(tocase(UNIQUE))['whatever'] == ['alter table whatever drop constraint whatever_a_key;']
+  assert diff_parse(reversed(tocase(UNIQUE)))['whatever'][0].args == ("can't add unique constraint, file a bug",)
