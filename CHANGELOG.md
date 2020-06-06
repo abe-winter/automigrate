@@ -2,7 +2,7 @@
 
 ## 0.1.x
 
-* unreleased
+* 0.1.2
   - internal: looser yaml dep for compat with other packages
   - bugfix: don't drop columns on sqlite (because sqlite doesn't drop columns)
 * 0.1.1
