@@ -14,7 +14,9 @@ def init(args, connect=psycopg2.connect, dialect='postgres'):
     return
   con = connect(args.automig_con)
   if dialect == 'sqlite':
-    con.cursor().executescript(sql)
+    cur = con.cursor()
+    cur.execute('begin')
+    cur.executescript(sql)
   else:
     con.cursor().execute(sql)
   con.commit()
@@ -23,6 +25,7 @@ def update(args, connect=psycopg2.connect, dialect='postgres'):
   "body for `update` command"
   con = connect(args.automig_con)
   cur = con.cursor()
+  cur.execute('begin')
   cur.execute('select sha from automigrate_meta order by id desc limit 1')
   last_sha, = cur.fetchone()
   range_ = f"{last_sha}...{args.target}"
@@ -39,9 +42,9 @@ def update(args, connect=psycopg2.connect, dialect='postgres'):
     print('update is empty, skipping')
   else:
     if dialect == 'sqlite':
-      con.cursor().executescript(sql)
+      cur.executescript(sql)
     else:
-      con.cursor().execute(sql)
+      cur.execute(sql)
     con.commit()
 
 def create_parser(doc):

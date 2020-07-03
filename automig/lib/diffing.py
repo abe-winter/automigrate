@@ -49,6 +49,7 @@ def diff_column(table, colname, left, right):
     # note: I think the possible values here are (None | True), shouldn't ever be False
     # todo: refactor this to `null` and include null / not_null as sources
     # todo: this is assuming that 'not specified' is nullable -- link to DB docs supporting this and figure out the pkey case
+    # todo: not allowed under sqlite dialect
     ret.append(f"{prefix} {'set' if right.not_null else 'drop'} not null;")
   return ret
 
