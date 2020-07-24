@@ -52,6 +52,7 @@ Postgres is the primary database I test on, with sqlite support secondary.
 ## Advanced features
 
 * [Instructions for doing kube-native migrations](./kube) are in the `kube` folder.
+* Lambda support: you'll need to bundle a binary version of git that's compatible with amazonlinux. Post an issue if you need help with this.
 * You can skip over bad diffs using `--opaque` mode, docs coming soon
 * You can specify manual overrides for erroring diffs by using [.manualmig.yml file](./.manualmig.yml), docs coming soon.
 * Convert an existing DB to use automig -- please post a github issue if you have this issue and I'll add instructions
