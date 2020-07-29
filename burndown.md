@@ -33,15 +33,18 @@
 
 * [ ] keep glob string in history; changing glob should be an intentional thing, not an accident. glob should only be in `init`, reuse in update
 * [ ] before / after for alter column -- a lot of code may depend on column order
+* .manualmig.yml:
+	- [ ] hooks for data migrations
+	- [ ] 'opaque' set for skipping bad migrations that need to be opaque
+* [ ] confirm sqlite is in transaction
 
 ### 0.2.0
 
-* [ ] `.manualmig.yml` skip section for skipping bad migrations that need to be opaque (THIS IS TOP PRIORITY FOR 0.2)
 * [ ] enums
-* [ ] take more than one glob
+* [ ] take more than one glob, or better: list of globs so I don't have to single-quote asterisks
 * [ ] test 'create extension' and support if not working
 * [ ] command to list dangerous operations in a diff (anything that drops data or schemas, any big / slow locking operations), so users can require CI signoff
-* [ ] way to do a test run on working dir w/ rollback
+* [ ] way to do a test run on working dir w/ rollback (rollback tricky because of missing 'drop table' in all dialects and lack of 'drop column' sup in sqlite)
 
 ### 0.3.0
 
