@@ -50,3 +50,4 @@
 
 * [ ] integration test with mysql and postgres
 * [ ] design drop table
+* [ ] .manualmig.yml feature to rename table and column
