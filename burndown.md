@@ -37,6 +37,7 @@
 	- [ ] hooks for data migrations
 	- [ ] 'opaque' set for skipping bad migrations that need to be opaque
 * [ ] confirm sqlite is in transaction
+* [ ] add --init-if-necessary flag to 'update' (will be different per DB)
 
 ### 0.2.0
 
