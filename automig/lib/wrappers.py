@@ -69,6 +69,14 @@ def split_pun(tokens):
     groups.pop()
   return groups
 
+def unquote(literal):
+  # guessing this isn't full-featured re escapes; ideally yon parser library would know how to do this?
+  assert literal.ttype[0] == 'Literal'
+  if literal.ttype[1] == 'String':
+    return literal.value[1:-1]
+  else:
+    raise NotImplementedError('unhandled literal subtype', literal.ttype)
+
 class ParsedColumn:
   # todo: py 3.7 dataclass
   __slots__ = ('success', 'name', 'type', 'default', 'unique', 'not_null', 'pkey')
@@ -202,6 +210,25 @@ class CreateIndex(WrappedStatement):
     "unique key -- in this case, ('create', name) because we only allow one create stmt per table"
     return ('index', self.index_name)
 
+class CreateEnum(WrappedStatement):
+  def __init__(self, stmt):
+    assert stmt[-1][-1][0].value.lower() == 'enum', f'Expected enum got {stmt[-1][-1][0].value.lower()}'
+    super().__init__(stmt)
+
+  @property
+  def name(self):
+    return self.stmt[-1][0].value
+
+  @property
+  def values(self):
+    paren = self.stmt[-1][-1][-1]
+    assert isinstance(paren, sqlparse.sql.Parenthesis)
+    return [unquote(item) for item, in split_pun(paren)]
+
+  @property
+  def unique(self):
+    return ('enum', self.name)
+
 # pylint: disable=inconsistent-return-statements
 def wrap(stmt):
   assert isinstance(stmt, sqlparse.sql.Statement)
@@ -211,6 +238,10 @@ def wrap(stmt):
       return CreateTable(stmt)
     elif 'index' in keywords:
       return CreateIndex(stmt)
+    elif 'type' in keywords:
+      return CreateEnum(stmt)
+    else:
+      raise TypeError('unk statement', keywords)
   elif stmt.get_type() == 'UNKNOWN':
     pass # cross fingers this means whitespace
   else:

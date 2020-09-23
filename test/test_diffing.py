@@ -1,7 +1,7 @@
 import pytest, sqlparse, collections, re
 from automig.lib import diffing, wrappers
 
-RE_KEYWORDS = re.compile('create|table|int|primary key|alter|add|column|set|default|not null|type|varchar|unique|index|drop|constraint|partition|by|on|range')
+RE_KEYWORDS = re.compile('create|table|int|primary key|alter|add|column|set|default|not null|type|varchar|unique|index|drop|constraint|partition|by|on|range|as|enum')
 
 ARGS = collections.namedtuple('args', 'dialect')('postgres')
 
@@ -226,3 +226,16 @@ UNIQUE = [
 def test_modify_unique(tocase):
   assert diff_parse(tocase(UNIQUE))['whatever'] == ['alter table whatever drop constraint whatever_a_key;']
   assert diff_parse(reversed(tocase(UNIQUE)))['whatever'][0].args == ("can't add unique constraint, file a bug",)
+
+ENUMS = [
+  "create type letters as enum ('a', 'b')",
+  "create type letters as enum ('a', 'b', 'c')",
+]
+
+def test_parse_enum(tocase):
+  wrapped = wrappers.wrap(sqlparse.parse(tocase(ENUMS[0]))[0])
+  assert wrapped.name == 'letters'
+  assert wrapped.values == ['a', 'b']
+
+def test_diff_enum(tocase):
+  assert list(map(type, diff_parse(tocase(ENUMS))['enum', 'letters'])) == [diffing.UnsupportedChange]

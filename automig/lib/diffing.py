@@ -11,6 +11,8 @@ def group_by_table(stmts):
   for stmt in stmts:
     if isinstance(stmt, (wrappers.CreateTable, wrappers.CreateIndex)):
       groups[stmt.table].append(stmt)
+    elif isinstance(stmt, wrappers.CreateEnum):
+      groups['enum', stmt.name].append(stmt)
     elif stmt is None:
       pass # where are these coming from? it happens in the test suite even
     else:
@@ -53,7 +55,7 @@ def diff_column(table, colname, left, right):
     ret.append(f"{prefix} {'set' if right.not_null else 'drop'} not null;")
   return ret
 
-# todo: refactor, this is too complicated
+# todo: break out per-type diffing, this is too complicated
 # pylint: disable=too-many-branches
 def diff_stmt(args, left, right):
   "diff two WrappedStmt with same unique key. return list of statements to run."
@@ -103,6 +105,8 @@ def diff_stmt(args, left, right):
       f'drop index {left.index_name};',
       str(right.stmt)
     ]
+  elif isinstance(left, wrappers.CreateEnum):
+    return [UnsupportedChange("diffing enums not written yet -- file a bug")]
   else:
     raise DiffError("unhandled type", type(left))
 
