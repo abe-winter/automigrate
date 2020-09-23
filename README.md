@@ -9,9 +9,9 @@ Unlike other migration tools, it uses git history to do diffs on `create table` 
 
 ## How is this different
 
-This tool doesn't make you write & manage a giant folder of up/down migrations. It uses git history to infer them instead, and to version production databases.
+This tool uses git history to infer database migrations, and uses git SHAs to version production databases.
 
-Other schema migration tools typically work by diffing ORM definitions against a live database (which can be your local DB). Often these diffs are then checked into a giant folder in your project repo.
+Other schema migration tools typically work by diffing ORM definitions against a live database (which can be your local DB). Often these diffs are then checked into a folder in your project repo.
 
 This tool only requires you to create and edit the desired state of your database, i.e. a file or folder full of `create table` and `create index` statements. This tool looks at the git history of that file and automatically infers the DDL statements to get from and old point in history to the new one.
 
