@@ -119,6 +119,10 @@ class Column:
   def parse(self):
     "return a ParsedColumn. This is rudimentary and will fail on hard cases"
     name, *tokens = self.tokens
+    if len(tokens) == 0:
+      # this is the custom type case (exercised in test_transform_enum)
+      name, type_ = omit_space(name)
+      return ParsedColumn(True, name.value, type_.value)
     if not isinstance(name, sqlparse.sql.Identifier):
       return ParsedColumn(False)
     type_, *tokens = tokens

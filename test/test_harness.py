@@ -27,3 +27,10 @@ def test_transform_composite_key():
   # note: I think that still doesn't support this
   sa_tables = transform_string('create table t1 (a int, b int, primary key (a, b));')
   assert sa_tables == ["t1_table = sa.Table('t1', META, sa.Column('a', sa.Integer, primary_key=True), sa.Column('b', sa.Integer, primary_key=True))"]
+
+def test_transform_enum():
+  sa_tables = transform_string("create type letters as enum ('a', 'b');\ncreate table t (col letters);")
+  assert sa_tables == [
+    'class lettersEnum(enum.Enum):\n\ta = 1\n\tb = 2',
+    "t_table = sa.Table('t', META, sa.Column('col', sa.Enum(lettersEnum)))",
+  ]
