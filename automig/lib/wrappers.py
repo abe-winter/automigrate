@@ -212,22 +212,25 @@ class CreateIndex(WrappedStatement):
 
 class CreateEnum(WrappedStatement):
   def __init__(self, stmt):
-    assert stmt[-1][-1][0].value.lower() == 'enum', f'Expected enum got {stmt[-1][-1][0].value.lower()}'
+    assert stmt[-2][-1][0].value.lower() == 'enum', f'Expected enum got {stmt[-2][-1][0].value.lower()}'
     super().__init__(stmt)
 
   @property
   def name(self):
-    return self.stmt[-1][0].value
+    return self.stmt[-2][0].value
 
   @property
   def values(self):
-    paren = self.stmt[-1][-1][-1]
+    paren = self.stmt[-2][-1][-1]
     assert isinstance(paren, sqlparse.sql.Parenthesis)
     return [unquote(item) for item, in split_pun(paren)]
 
   @property
   def unique(self):
     return ('enum', self.name)
+
+def omit_space(tokens):
+  return [token for token in tokens if not token.is_whitespace]
 
 # pylint: disable=inconsistent-return-statements
 def wrap(stmt):
@@ -240,6 +243,9 @@ def wrap(stmt):
       return CreateIndex(stmt)
     elif 'type' in keywords:
       return CreateEnum(stmt)
+    elif omit_space(stmt)[1].value.lower() == 'extension':
+      # todo: this is probably wrong; I think this is 'working' because uuid is available by default
+      return None
     else:
       raise TypeError('unk statement', keywords)
   elif stmt.get_type() == 'UNKNOWN':

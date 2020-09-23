@@ -1,7 +1,7 @@
 import pytest, sqlparse, collections, re
 from automig.lib import diffing, wrappers
 
-RE_KEYWORDS = re.compile('create|table|int|primary key|alter|add|column|set|default|not null|type|varchar|unique|index|drop|constraint|partition|by|on|range|as|enum')
+RE_KEYWORDS = re.compile('create|table|int|primary key|alter|add|column|set|default|not null|type|varchar|unique|index|drop|constraint|partition|by|on|range|as|enum|extension|if|not exists')
 
 ARGS = collections.namedtuple('args', 'dialect')('postgres')
 
@@ -228,8 +228,8 @@ def test_modify_unique(tocase):
   assert diff_parse(reversed(tocase(UNIQUE)))['whatever'][0].args == ("can't add unique constraint, file a bug",)
 
 ENUMS = [
-  "create type letters as enum ('a', 'b')",
-  "create type letters as enum ('a', 'b', 'c')",
+  "create type letters as enum ('a', 'b');",
+  "create type letters as enum ('a', 'b', 'c');",
 ]
 
 def test_parse_enum(tocase):
@@ -239,3 +239,6 @@ def test_parse_enum(tocase):
 
 def test_diff_enum(tocase):
   assert list(map(type, diff_parse(tocase(ENUMS))['enum', 'letters'])) == [diffing.UnsupportedChange]
+
+def test_parse_extension(tocase):
+  assert wrappers.wrap(sqlparse.parse(tocase('create extension if not exists "uuid-ossp"'))[0]) is None
