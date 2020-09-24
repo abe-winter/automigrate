@@ -65,13 +65,13 @@ def test_transform_composite_key_decl():
 def test_transform_enum_classic():
   argv = args()
   assert transform_string(argv, CASES['enum']) == [
-    'class lettersEnum(enum.Enum):\n  a = 1\n  b = 2',
+    'class lettersEnum(enum.Enum):\n  a = "a"\n  b = "b"',
     "t_table = sa.Table('t', META,\n  sa.Column('col', sa.Enum(lettersEnum)),\n)",
   ]
 
 def test_transform_enum_decl():
   argv = args(False)
   assert transform_string(argv, CASES['enum']) == [
-    'class lettersEnum(enum.Enum):\n  a = 1\n  b = 2',
+    'class lettersEnum(enum.Enum):\n  a = "a"\n  b = "b"',
     "class T(Base):\n  __tablename__ = 't'\n  col = sa.Column(sa.Enum(lettersEnum))",
   ]

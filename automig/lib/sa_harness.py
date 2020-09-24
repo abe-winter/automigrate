@@ -78,7 +78,8 @@ def transform(args, table_stmts, delim='\n  '):
         index_cols = ['%s_table.c.%s' % (stmt.table, ident) for ident, in wrappers.split_pun(paren)]
         indexes.append(f"{stmt.index_name}_index = sa.Index('{stmt.index_name}', {', '.join(index_cols)})")
       elif isinstance(stmt, wrappers.CreateEnum):
-        table_strings.append(delim.join([f"class {stmt.name}Enum(enum.Enum):"] + [f'{val} = {i + 1}' for i, val in enumerate(stmt.values)]))
+        assert not any('"' in val for val in stmt.values), f"error: this doesn't know how to handle quotes in enum values {str(stmt.values)}"
+        table_strings.append(delim.join([f"class {stmt.name}Enum(enum.Enum):"] + [f'{val} = "{val}"' for i, val in enumerate(stmt.values)]))
         TYPES[stmt.name] = f"sa.Enum({stmt.name}Enum)"
       else:
         raise TypeError('unhandled statement type', type(stmt))

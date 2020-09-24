@@ -38,6 +38,7 @@
 	- [ ] 'opaque' set for skipping bad migrations that need to be opaque
 * [ ] confirm sqlite is in transaction
 * [ ] add --init-if-necessary flag to 'update' (will be different per DB)
+* [ ] warn when schema.sql has uncommitted changes
 
 ### 0.2.0
 
