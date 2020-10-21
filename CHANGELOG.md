@@ -2,7 +2,8 @@
 
 ## 0.1.x
 
-* unreleased
+* 0.1.3
+  - BUGFIX: infinite loop case when parsing columns with unofficial types
   - wrap DDL in transaction so partial changes don't apply on sqlite
   - support creating, but not yet diffing, enums
   - toggle classic / declarative mapping in `sa_harness`

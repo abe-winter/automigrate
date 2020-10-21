@@ -37,8 +37,10 @@
 	- [ ] hooks for data migrations
 	- [ ] 'opaque' set for skipping bad migrations that need to be opaque
 * [ ] confirm sqlite is in transaction
-* [ ] add --init-if-necessary flag to 'update' (will be different per DB)
+* [ ] add --init-if-necessary flag to 'update' (will be different per DB) so there can be a single entrypoint command
 * [ ] warn when schema.sql has uncommitted changes
+* [ ] consider upgrading to new sqlparse or writing parser
+* [ ] fix random keywords not allowed as column names (or at least warn)
 
 ### 0.2.0
 

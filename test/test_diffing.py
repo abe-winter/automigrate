@@ -242,3 +242,8 @@ def test_diff_enum(tocase):
 
 def test_parse_extension(tocase):
   assert wrappers.wrap(sqlparse.parse(tocase('create extension if not exists "uuid-ossp"'))[0]) is None
+
+def test_infinite_loop():
+  "this was failing in an early version because 'bool' isn't supported in the parser and the test for 'custom type' was broken by 'default false'"
+  wrapped = wrappers.wrap(sqlparse.parse("create table t (x bool default false)")[0])
+  assert wrapped.columns()[0].parse().type == 'bool'

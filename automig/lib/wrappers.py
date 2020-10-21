@@ -118,15 +118,17 @@ class Column:
 
   def parse(self):
     "return a ParsedColumn. This is rudimentary and will fail on hard cases"
-    name, *tokens = self.tokens
-    if len(tokens) == 0:
-      # this is the custom type case (exercised in test_transform_enum)
-      name, type_ = omit_space(name)
-      return ParsedColumn(True, name.value, type_.value)
-    if not isinstance(name, sqlparse.sql.Identifier):
+    probably_name, *tokens = self.tokens
+    if any(tok.is_whitespace for tok in probably_name):
+      # yes, the parser has returned an Identifier with a space inside of it. Ugh.
+      # this is the case where the type name is custom (i.e. enum) or bool (vs boolean)
+      name, type_ = omit_space(probably_name)
+    elif not isinstance(probably_name, sqlparse.sql.Identifier):
       return ParsedColumn(False)
-    type_, *tokens = tokens
-    if not isinstance(type_, sqlparse.sql.Function) and type_.ttype[-1] not in ('Builtin', 'Keyword'):
+    else:
+      name = probably_name
+      type_, *tokens = tokens
+    if not isinstance(type_, (sqlparse.sql.Function, sqlparse.sql.Identifier)) and type_.ttype[-1] not in ('Builtin', 'Keyword'):
       return ParsedColumn(False)
     success = ParsedColumn(True, name.value, type_.value)
     if tokens and isinstance(tokens[0], sqlparse.sql.SquareBrackets):
@@ -147,6 +149,9 @@ class Column:
           _, key, *tokens = tokens
           assert key.normalized.lower() == 'key'
           success.pkey = True
+        else:
+          # note: this is protecting against an infinite loop
+          raise TypeError("Don't know how to handle", tokens[0])
       else:
         return ParsedColumn(False)
     return success
