@@ -117,6 +117,7 @@ class Column:
     return ' '.join(map(str, self.tokens))
 
   def parse(self):
+    # pylint: disable=too-many-branches
     "return a ParsedColumn. This is rudimentary and will fail on hard cases"
     probably_name, *tokens = self.tokens
     if any(tok.is_whitespace for tok in probably_name):
