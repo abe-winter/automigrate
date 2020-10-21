@@ -177,7 +177,7 @@ def test_no_index_name(tocase):
 
 def test_edit_index(tocase):
   assert diff_parse(tocase(EDIT_INDEX))['t1'] == [
-    'drop index idx_col1;',
+    'drop index if exists idx_col1;',
     tocase('create index idx_col1 on t1 (col1, col2);'),
   ]
 

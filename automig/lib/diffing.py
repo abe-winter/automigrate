@@ -102,7 +102,9 @@ def diff_stmt(args, left, right):
     return changes
   elif isinstance(left, wrappers.CreateIndex):
     return [
-      f'drop index {left.index_name};',
+      # note: 'if exists' because other changes can sometimes automatically destroy an index
+      # todo: sqlite probably doesn't support dropping
+      f'drop index if exists {left.index_name};',
       str(right.stmt)
     ]
   elif isinstance(left, wrappers.CreateEnum):

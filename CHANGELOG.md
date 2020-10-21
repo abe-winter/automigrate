@@ -2,6 +2,8 @@
 
 ## 0.1.x
 
+* 0.1.4
+  - BUGFIX: 'drop index if exists' because dropping columns can drop indexes automatically, causing errors
 * 0.1.3
   - BUGFIX: infinite loop case when parsing columns with unofficial types
   - wrap DDL in transaction so partial changes don't apply on sqlite
