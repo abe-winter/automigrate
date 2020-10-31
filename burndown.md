@@ -20,6 +20,7 @@
   - [ ] troubleshoot and resolve `automigrate_meta` errors
   - [ ] using manualmig when the tool is confused
 * [x] `--opaque` flag to repair non-linear git history (i.e. rebase)
+* [ ] foreign keys
 
 ## Burndown
 
@@ -55,3 +56,7 @@
 * [ ] integration test with mysql and postgres
 * [ ] design drop table
 * [ ] .manualmig.yml feature to rename table and column
+
+### 0.4.0
+
+* [ ] foreign key support
