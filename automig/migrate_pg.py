@@ -26,9 +26,12 @@ def update(args, connect=psycopg2.connect, dialect='postgres'):
   con = connect(args.automig_con)
   cur = con.cursor()
   cur.execute('begin')
-  cur.execute('select sha from automigrate_meta order by id desc limit 1')
-  last_sha, = cur.fetchone()
-  range_ = f"{last_sha}...{args.target}"
+  if '..' in args.target:
+    range_ = args.target
+  else:
+    cur.execute('select sha from automigrate_meta order by id desc limit 1')
+    last_sha, = cur.fetchone()
+    range_ = f"{last_sha}...{args.target}"
   print("range is", range_)
   pass_down_args = [range_, args.glob, '--dialect', dialect]
   if args.opaque:
