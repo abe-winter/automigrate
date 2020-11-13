@@ -1,5 +1,9 @@
 # .manualmig
-# this overrides migration errors
+# this overrides migration errors per table per commit
 overrides:
   c479bb060c2c162c496578f86c7f4addf45ff560:
     t1: ['alter table t1 alter column b type text;']
+# 'skips' section skips whole commits. i.e. if a schema changes in commits 2, 3 and 4, and you skip 3, it will apply the 2 -> 4 diff.
+# useful for typos
+skips:
+- some_full_hex_sha
