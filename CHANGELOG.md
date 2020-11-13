@@ -2,6 +2,9 @@
 
 ## 0.1.x
 
+* 0.1.5
+  - bugfix: support range --target (i.e. sha..HEAD) in `automig_pg`
+  - 'skips' key in .manualmig.yml that takes a list of full-length shas to skip (needs docs somewhere)
 * 0.1.4
   - BUGFIX: 'drop index if exists' because dropping columns can drop indexes automatically, causing errors
 * 0.1.3

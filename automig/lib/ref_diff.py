@@ -24,7 +24,7 @@ def ref_diff(args, repo, ref1, ref2, pattern):
   return diffing.diff(args, left, right)
 
 # pylint: disable=too-many-arguments
-def ref_range_diff(args, repo, ref1, ref2, pattern, opaque=False):
+def ref_range_diff(args, repo, ref1, ref2, pattern, opaque=False, skips=()):
   "run ref_diff() once per intermediate commit for commits who change files matching pattern"
   assert not os.path.isabs(pattern), "we don't know how to transform glob to absolute path -- file a bug"
   assert os.path.isabs(repo.working_dir), "working dir is non-abs -- file a bug"
@@ -41,7 +41,11 @@ def ref_range_diff(args, repo, ref1, ref2, pattern, opaque=False):
     commits = [repo.commit(ref1)] + commits[:1]
   else:
     commits.append(repo.commit(ref1))
-    commits = list(reversed(commits))
+    skippable = [commit.hexsha for commit in commits if commit.hexsha in skips]
+    if skippable:
+      print('-- skipping per manualmig: %s' % skippable)
+    # todo: document + test manualmig skips feature
+    commits = list(filter(lambda commit: commit.hexsha not in skips, reversed(commits)))
   return collections.OrderedDict([
     [right.hexsha, ref_diff(args, repo, left.hexsha, right.hexsha, str(absglob))]
     for left, right in zip(commits[:-1], commits[1:])
