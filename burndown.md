@@ -32,28 +32,33 @@
 
 ### 0.1.x
 
+* [ ] instructions for working with branches locally + in prod
 * [ ] keep glob string in history; changing glob should be an intentional thing, not an accident. glob should only be in `init`, reuse in update
 * [ ] before / after for alter column -- a lot of code may depend on column order
 * .manualmig.yml:
 	- [ ] hooks for data migrations
-	- [ ] 'opaque' set for skipping bad migrations that need to be opaque
+	- [x] 'opaque' set for skipping bad migrations that need to be opaque
 * [ ] confirm sqlite is in transaction
 * [ ] add --init-if-necessary flag to 'update' (will be different per DB) so there can be a single entrypoint command
-* [ ] warn when schema.sql has uncommitted changes
-* [ ] consider upgrading to new sqlparse or writing parser
-* [ ] fix random keywords not allowed as column names (or at least warn)
+* working dir features
+	- [ ] warn when schema.sql has uncommitted changes
+	- [ ] way to do a test run on working dir w/ rollback (rollback tricky because of missing 'drop table' in all dialects and lack of 'drop column' sup in sqlite)
+* [ ] 'pre' and 'post' migrations -- i.e. add columns before deploying backend code, drop columns after (potentially using a timer to support rollback)
+* [ ] update deps, in particular sqlparse and gitpython. shop for a more complete sql parser (I think there's a postgres-specific one)
 
 ### 0.2.0
 
-* [ ] enums
+* [x] enums
 * [ ] take more than one glob, or better: list of globs so I don't have to single-quote asterisks
 * [ ] test 'create extension' and support if not working
 * [ ] command to list dangerous operations in a diff (anything that drops data or schemas, any big / slow locking operations), so users can require CI signoff
-* [ ] way to do a test run on working dir w/ rollback (rollback tricky because of missing 'drop table' in all dialects and lack of 'drop column' sup in sqlite)
+* parsing features
+	- [ ] consider upgrading to new version of sqlparse library, or switching parser, or writing one -- we currently wrap sqlparse pretty intensely
+	- [ ] fix random keywords not allowed as column names (or at least warn)
 
 ### 0.3.0
 
-* [ ] integration test with mysql and postgres
+* [ ] integration test with postgres, maybe also mysql
 * [ ] design drop table
 * [ ] .manualmig.yml feature to rename table and column
 
