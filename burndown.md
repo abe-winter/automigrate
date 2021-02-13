@@ -44,7 +44,7 @@
 	- [ ] warn when schema.sql has uncommitted changes
 	- [ ] way to do a test run on working dir w/ rollback (rollback tricky because of missing 'drop table' in all dialects and lack of 'drop column' sup in sqlite)
 * [ ] 'pre' and 'post' migrations -- i.e. add columns before deploying backend code, drop columns after (potentially using a timer to support rollback)
-* [ ] update deps, in particular sqlparse and gitpython. shop for a more complete sql parser (I think there's a postgres-specific one)
+* [x] update deps, in particular sqlparse and gitpython
 
 ### 0.2.0
 
@@ -53,8 +53,8 @@
 * [ ] test 'create extension' and support if not working
 * [ ] command to list dangerous operations in a diff (anything that drops data or schemas, any big / slow locking operations), so users can require CI signoff
 * parsing features
-	- [ ] consider upgrading to new version of sqlparse library, or switching parser, or writing one -- we currently wrap sqlparse pretty intensely
-	- [ ] fix random keywords not allowed as column names (or at least warn)
+	- [ ] consider switching parsers, or writing one -- we currently wrap sqlparse pretty intensely
+	- [ ] fix random keywords not allowed as column names (or at least warn). `source`, `owner`. write a failing test for this.
 
 ### 0.3.0
 
