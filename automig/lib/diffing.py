@@ -108,7 +108,15 @@ def diff_stmt(args, left, right):
       str(right.stmt)
     ]
   elif isinstance(left, wrappers.CreateEnum):
-    return [UnsupportedChange("diffing enums not written yet -- file a bug")]
+    old_vals = set(left.values)
+    new_vals = set(right.values)
+    changes = []
+    if old_vals - new_vals:
+      return [UnsupportedChange("removing enum values not supported yet -- file a bug")]
+    for val in new_vals - old_vals:
+      # warning: if enum vals have quotes in them this fails probably
+      changes.append(f"alter type {left.name} add value '{val}'")
+    return changes
   else:
     raise DiffError("unhandled type", type(left))
 

@@ -2,6 +2,8 @@
 
 ## 0.1.x
 
+* 0.1.7
+  - support modify enum
 * 0.1.6
   - update dep versions
   - support create extension

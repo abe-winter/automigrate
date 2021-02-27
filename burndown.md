@@ -50,7 +50,7 @@
 
 * enums
 	- [x] create
-	- [ ] modify
+	- [x] modify
 * [ ] take more than one glob, or better: list of globs so I don't have to single-quote asterisks
 * [x] test 'create extension' and support if not working
 * [ ] command to list dangerous operations in a diff (anything that drops data or schemas, any big / slow locking operations), so users can require CI signoff
