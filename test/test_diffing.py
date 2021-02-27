@@ -238,10 +238,17 @@ def test_parse_enum(tocase):
   assert wrapped.values == ['a', 'b']
 
 def test_diff_enum(tocase):
-  assert list(map(type, diff_parse(tocase(ENUMS))['enum', 'letters'])) == [diffing.UnsupportedChange]
+  assert list(map(type, diff_parse(tocase(ENUMS))[wrappers.CreateEnum, 'letters'])) == [diffing.UnsupportedChange]
+
+CREATE_EXT = 'create extension if not exists "uuid-ossp";'
 
 def test_parse_extension(tocase):
-  assert wrappers.wrap(sqlparse.parse(tocase('create extension if not exists "uuid-ossp"'))[0]) is None
+  ext = wrappers.wrap(sqlparse.parse(tocase(CREATE_EXT))[0])
+  assert isinstance(ext, wrappers.CreateExtension)
+  assert ext.name == '"uuid-ossp"'
+
+def test_add_extension(tocase):
+  assert diff_parse(['', tocase(CREATE_EXT)])[wrappers.CreateExtension, '"uuid-ossp"'] == [tocase('create extension if not exists "uuid-ossp";')]
 
 def test_infinite_loop():
   "this was failing in an early version because 'bool' isn't supported in the parser and the test for 'custom type' was broken by 'default false'"

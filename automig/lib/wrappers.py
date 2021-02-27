@@ -239,6 +239,12 @@ class CreateEnum(WrappedStatement):
   def unique(self):
     return ('enum', self.name)
 
+class CreateExtension(WrappedStatement):
+  @property
+  def name(self):
+    idents = list(filter(lambda x: isinstance(x, sqlparse.sql.Identifier), self.stmt))
+    return idents[-1].value
+
 def omit_space(tokens):
   return [token for token in tokens if not token.is_whitespace]
 
@@ -254,8 +260,7 @@ def wrap(stmt):
     elif 'type' in keywords:
       return CreateEnum(stmt)
     elif omit_space(stmt)[1].value.lower() == 'extension':
-      # todo: this is probably wrong; I think this is 'working' because uuid is available by default
-      return None
+      return CreateExtension(stmt)
     else:
       raise TypeError('unk statement', keywords)
   elif stmt.get_type() == 'UNKNOWN':

@@ -61,6 +61,7 @@
 * [ ] integration test with postgres, maybe also mysql
 * [ ] design drop table
 * [ ] .manualmig.yml feature to rename table and column
+* [ ] advanced merging support -- some way to inherit columns from other libraries / locations
 
 ### 0.4.0
 

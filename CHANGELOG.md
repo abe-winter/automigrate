@@ -4,6 +4,7 @@
 
 * unreleased
   - update dep versions
+  - support create extension
 * 0.1.5
   - bugfix: support range --target (i.e. sha..HEAD) in `automig_pg`
   - 'skips' key in .manualmig.yml that takes a list of full-length shas to skip (needs docs somewhere)
