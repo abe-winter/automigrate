@@ -48,9 +48,11 @@
 
 ### 0.2.0
 
-* [x] enums
+* enums
+	- [x] create
+	- [ ] modify
 * [ ] take more than one glob, or better: list of globs so I don't have to single-quote asterisks
-* [ ] test 'create extension' and support if not working
+* [x] test 'create extension' and support if not working
 * [ ] command to list dangerous operations in a diff (anything that drops data or schemas, any big / slow locking operations), so users can require CI signoff
 * parsing features
 	- [ ] consider switching parsers, or writing one -- we currently wrap sqlparse pretty intensely

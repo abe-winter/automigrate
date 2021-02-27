@@ -2,7 +2,7 @@
 
 ## 0.1.x
 
-* unreleased
+* 0.1.6
   - update dep versions
   - support create extension
 * 0.1.5
