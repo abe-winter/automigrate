@@ -238,7 +238,7 @@ def test_parse_enum(tocase):
   assert wrapped.values == ['a', 'b']
 
 def test_diff_enum(tocase):
-  assert diff_parse(tocase(ENUMS)) == {('enum', 'letters'): ["alter type letters add value 'c'"]}
+  assert diff_parse(tocase(ENUMS)) == {('enum', 'letters'): ["alter type letters add value 'c';"]}
 
 CREATE_EXT = 'create extension if not exists "uuid-ossp";'
 

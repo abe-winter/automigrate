@@ -44,7 +44,7 @@ def test_create_enum():
 def test_modify_enum():
   diff = ref_diff.ref_range_diff(ARGS, git.Repo(), SHAS['create-enum'], SHAS['modify-enum'], GLOB)
   shadiff, = diff.values()
-  assert shadiff == {('enum', 'letters'): ["alter type letters add value 'c'"]}
+  assert shadiff == {('enum', 'letters'): ["alter type letters add value 'c';"]}
 
 def test_add_multi_commit():
   diff = ref_diff.ref_range_diff(ARGS, git.Repo(), SHAS['create-t1'], SHAS['add-t2-t1a'], GLOB)

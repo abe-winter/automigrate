@@ -2,7 +2,9 @@
 
 ## 0.1.x
 
-* 0.1.7
+* 0.1.8
+  - bugfix for syntax error in 'alter type' (when changing enums)
+* 0.1.7 YANKED
   - support modify enum
 * 0.1.6
   - update dep versions
