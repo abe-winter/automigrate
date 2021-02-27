@@ -245,6 +245,10 @@ class CreateExtension(WrappedStatement):
     idents = list(filter(lambda x: isinstance(x, sqlparse.sql.Identifier), self.stmt))
     return idents[-1].value
 
+  @property
+  def unique(self):
+    return ('ext', self.name)
+
 def omit_space(tokens):
   return [token for token in tokens if not token.is_whitespace and not isinstance(token, sqlparse.sql.Comment)]
 

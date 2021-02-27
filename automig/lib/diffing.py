@@ -12,7 +12,7 @@ def group_by_table(stmts):
     if isinstance(stmt, (wrappers.CreateTable, wrappers.CreateIndex)):
       groups[stmt.table].append(stmt)
     elif isinstance(stmt, (wrappers.CreateEnum, wrappers.CreateExtension)):
-      groups[type(stmt), stmt.name].append(stmt)
+      groups[stmt.unique].append(stmt)
     elif stmt is None:
       pass # where are these coming from? it happens in the test suite even
     else:
