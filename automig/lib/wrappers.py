@@ -246,7 +246,7 @@ class CreateExtension(WrappedStatement):
     return idents[-1].value
 
 def omit_space(tokens):
-  return [token for token in tokens if not token.is_whitespace]
+  return [token for token in tokens if not token.is_whitespace and not isinstance(token, sqlparse.sql.Comment)]
 
 # pylint: disable=inconsistent-return-statements
 def wrap(stmt):
@@ -259,7 +259,7 @@ def wrap(stmt):
       return CreateIndex(stmt)
     elif 'type' in keywords:
       return CreateEnum(stmt)
-    elif omit_space(stmt)[1].value.lower() == 'extension':
+    elif [tok.value.lower() for tok in omit_space(stmt)[:2]] == ['create', 'extension']:
       return CreateExtension(stmt)
     else:
       raise TypeError('unk statement', keywords)
