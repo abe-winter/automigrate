@@ -45,6 +45,8 @@
 	- [ ] way to do a test run on working dir w/ rollback (rollback tricky because of missing 'drop table' in all dialects and lack of 'drop column' sup in sqlite)
 * [ ] 'pre' and 'post' migrations -- i.e. add columns before deploying backend code, drop columns after (potentially using a timer to support rollback)
 * [x] update deps, in particular sqlparse and gitpython
+* [ ] clearer errors when a column name is a keyword (for example 'month') rather than just forgetting to add the column
+* [ ] data migrations, i.e. support insert stmts, not just ddl.
 
 ### 0.2.0
 

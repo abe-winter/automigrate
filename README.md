@@ -1,6 +1,6 @@
 # automigrate
 
-Automigrate is a command-line tool for SQL migrations.
+Automigrate is a command-line tool for ORM-less SQL migrations.
 Unlike other migration tools, it uses git history to do diffs on `create table` statements instead of storing the migration history in a folder somewhere.
 
 * [How is this different](#how-is-this-different)
