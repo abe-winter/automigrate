@@ -26,7 +26,7 @@ def column_args(column, pkey_fields):
     dets['primary_key'] = True
   if parsed.default:
     # todo: figure out escaping here
-    dets['server_default'] = "sa.text('%s')" % parsed.default
+    dets['server_default'] = f"sa.text('{parsed.default}')"
   if parsed.unique:
     raise NotImplementedError('todo: sa_harness unique keys')
   if parsed.not_null:
@@ -46,7 +46,7 @@ TYPES = {
 def render_col(args, col_name, col_type, details, composite_pkey):
   if composite_pkey and col_name in composite_pkey:
     details['primary_key'] = True
-  params = ', '.join([TYPES[col_type]] + ['%s=%s' % pair for pair in details.items()])
+  params = ', '.join([TYPES[col_type]] + [f'{key}={val}' for key, val in details.items()])
   if args.classic:
     return f"sa.Column('{col_name}', {params}),"
   else:
@@ -75,7 +75,7 @@ def transform(args, table_stmts, delim='\n  '):
           continue
         paren = stmt.paren()
         assert isinstance(paren, sqlparse.sql.Parenthesis)
-        index_cols = ['%s_table.c.%s' % (stmt.table, ident) for ident, in wrappers.split_pun(paren)]
+        index_cols = [f'{stmt.table}_table.c.{ident}' for ident, in wrappers.split_pun(paren)]
         indexes.append(f"{stmt.index_name}_index = sa.Index('{stmt.index_name}', {', '.join(index_cols)})")
       elif isinstance(stmt, wrappers.CreateEnum):
         assert not any('"' in val for val in stmt.values), f"error: this doesn't know how to handle quotes in enum values {str(stmt.values)}"

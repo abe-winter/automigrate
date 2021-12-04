@@ -1,6 +1,8 @@
 [MESSAGES CONTROL]
 
-disable=line-too-long, multiple-imports, fixme, missing-function-docstring, multiple-statements, too-many-locals, trailing-comma-tuple, no-else-return, missing-class-docstring, no-else-raise
+disable=line-too-long, multiple-imports, fixme, missing-function-docstring, multiple-statements, too-many-locals, trailing-comma-tuple, no-else-return, missing-class-docstring, no-else-raise,
+	consider-using-with,
+	unspecified-encoding
 
 [FORMAT]
 
