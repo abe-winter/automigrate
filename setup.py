@@ -22,7 +22,7 @@ setup(
   },
   keywords=['sql', 'migration', 'git', 'diff'],
   install_requires=[
-    'sqlparse==0.3.0',
+    'sqlparse==0.4.2',
     'gitpython==3.1.0',
     'pyyaml>=5.1',
   ],
