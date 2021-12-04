@@ -43,7 +43,7 @@ def ref_range_diff(args, repo, ref1, ref2, pattern, opaque=False, skips=()):
     commits.append(repo.commit(ref1))
     skippable = [commit.hexsha for commit in commits if commit.hexsha in skips]
     if skippable:
-      print('-- skipping per manualmig: %s' % skippable)
+      print(f'-- skipping per manualmig: {skippable}')
     # todo: document + test manualmig skips feature
     commits = list(filter(lambda commit: commit.hexsha not in skips, reversed(commits)))
   return collections.OrderedDict([
